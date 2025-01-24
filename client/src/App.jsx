@@ -5,7 +5,6 @@ import userProfile from "./assets/userprofile.jpg"
 import send from "./assets/send.png"
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <div className='aiAvatarApp'>
