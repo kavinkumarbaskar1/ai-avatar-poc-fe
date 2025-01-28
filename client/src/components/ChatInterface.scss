@@ -26,10 +26,10 @@
 
 .chat-interface {
   position: absolute;
-  bottom: 80px; /* Space between icon and chat box */
+  bottom: 80px; 
   right: 0;
-  width: 400px; /* Increased width for a larger chat box */
-  height: 500px; /* Increased height */
+  width: 400px; 
+  height: 500px; 
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
@@ -44,8 +44,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: calc(100% - 80px); /* Deduct space for input */
-  overflow-y: auto; /* Scrollable messages */
+  max-height: calc(100% - 80px); 
+  overflow-y: auto; 
 }
 
 .aiAvatarSystemChat {
@@ -99,9 +99,9 @@
 }
 
 .sendButton img {
-  width: 24px; /* Larger icon */
+  width: 24px; 
   height: 24px;
-  filter: invert(1); /* Makes white icons visible on a green background */
+  filter: invert(1); 
 }
 
 .sendButton:hover {
