@@ -72,14 +72,58 @@
 //   }
 // }
 
+.headerContainer {
+  display: flex;
+  justify-content: space-between; /* This ensures spacing between the children */
+  align-items: center;
+}
+
+
+.generateContentButton {
+  padding: 10px 20px; /* Button styling */
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.aiAvatarAppChatAndPresentationContainer .aiAvatarUserprofile {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  margin-left: auto; /* Push the icon to the far right */
+}
+
+.aiAvatarAppChatAndPresentationContainer .aiAvatarUserprofile img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%; /* Ensure circular profile image */
+  object-fit: cover;
+}
+
+.generateContentButton:hover {
+  background-color: #45a049; /* Hover effect */
+}
+
+.aiAvatarUserprofile img {
+  width: 50px; /* Avatar size */
+  height: 50px;
+  border-radius: 50%; /* Make the avatar circular */
+  object-fit: cover;
+}
+
+
 .aiAvatarAppMainContainer {
   margin: 50px 50px;
   display: flex;
+  gap: 150px;
 
   .aiAvatarAppMenu {
     padding: 20px;
     flex: 1;
-    border-right: 1px solid lightgray;
+    // border-right: 1px solid lightgray;
     height: 87vh;
     display: flex;
     align-items: center;
@@ -97,9 +141,9 @@
         transition: all 0.3s ease; /* Smooth transition for hover and selection */
 
         &.selectedAvatar {
-          border: 3px solid #4caf50; /* Highlight with a green border */
-          box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); /* Optional glow effect */
-          transform: scale(1.1); /* Slightly larger for emphasis */
+          border: 3px solid #4caf50; 
+          box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); 
+          transform: scale(1.1); 
         }
 
         img {
@@ -129,12 +173,6 @@
       }
     }
 
-    .aiAvatarSelectedAvatar {
-      width: 190px; /* Adjusted size for consistency */
-      height: 190px;
-      cursor: pointer;
-    }
-
     video {
       width: 100%;
       height: 100%;
@@ -142,13 +180,16 @@
       border-radius: 50%;
     }
   }
-
-  .aiAvatarAppChatAndPresentationContainer {
-    padding: 20px;
-    flex: 2;
-  }
 }
 
+.line-separator {
+  width: 100%; /* Full width of the container */
+  height: 2px; /* Line height */
+  background-color: lightgray; /* Line color */
+  margin: 20px 0; /* Space around the line */
+  position: relative; /* Ensure the line is not hidden by other elements */
+  z-index: 1; /* Ensure it's in front if anything overlaps */
+}
 
 .subjects-container {
   width: 300px;
@@ -222,104 +263,52 @@
 }
 
 
-.aiAvatarAppChatAndPresentationContainer{
-
-  .generateContentButton {
-    margin-top: 10px;
-    padding: 10px 20px;
-    font-size: 14px;
-    color: #333;
-    background-color: lightgray;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .generateContentButton:hover {
-    background-color: #0056b3;
-  }
-
-  .aiAvatarUserprofile{
-      width: 50px;
-      height: 50px;
-      cursor: pointer;
-      float: right;
-
-      img{
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          border-radius: 50%;
-      }
-  }
-
-  .aiAvatarPresentationView{
-    margin-top: 5rem;
-    height: 60%;
-    display: flex;
-    border-radius: 15px;
-    align-items: center;
-    justify-content: center;
-  }
-}
-
-.aiAvatarChatInterface{
-  margin-top: 10px;
-  border: 1px solid lightgray;
-  border-radius: 20px;
-  height: 20%;
+.aiAvatarAppChatAndPresentationContainer {
   padding: 20px;
-  color: white;
+  flex: 3;
   display: flex;
   flex-direction: column;
-  row-gap: 20px;
-  overflow-y: scroll;
-
-  .aiAvatarSystemChat{
-      padding: 5px 10px;
-      background-color: grey;
-      width: 45%;
-      border-radius: 20px;
-  }
-
-  .aiAvatarUserChat{
-      padding: 5px 10px;
-      background-color: rgb(165, 165, 165);
-      width: 50%;
-      border-radius: 20px;
-      margin-left: 48%;
-  }
+  gap: 20px;
 }
 
-.chatInput{
-  margin-top: 25px;
-  border: 1px solid lightgrey;
-  border-radius: 10px;
-  padding: 10px;
+.aiAvatarSelectedAvatarContainer {
+  display: flex;
+  justify-content: center; 
+  margin-bottom: 20px;
+}
+
+.aiAvatarSelectedAvatar {
+  width: 250px; 
+  height: 250px; 
+  border-radius: 50%; 
+  overflow: hidden; 
+}
+
+.aiAvatarSelectedAvatar video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  border-radius: 50%;
+}
+
+.aiAvatarPresentationView {
+  margin-top: 20px; 
+  height: 60%;
+  display: flex;
+  border-radius: 15px;
+  align-items: center;
+  justify-content: center;
+}
+
+.headerContainer {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
 
-  input{
-      padding: 5px;
-      border: 1px solid black;
-      width: 900px;
-      border: none;
-
-      &:focus{
-          outline: none;
-      }
-  }
-
-  .sendButton{
-      height: 25px;
-      width: 25px;
-      cursor: pointer;
-      
-      img{
-          height: 100%;
-          width: 100%;
-      }
-  }
-
+.aiAvatarUserprofile img {
+  width: 50px; /* Avatar size */
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
 }
