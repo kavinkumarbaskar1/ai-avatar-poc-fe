@@ -4,74 +4,151 @@
   box-sizing: border-box;
 }
 
-.aiAvatarAppMainContainer{
+// .aiAvatarAppMainContainer{
+//   margin: 50px 50px;
+//   display: flex;
+
+//   .aiAvatarAppMenu{
+//       padding: 20px;
+//       flex: 1;
+//       border-right: 1px solid lightgray;
+//       height: 87vh;
+//       display: flex;
+//       align-items: center;
+//       justify-content: space-between;
+//       flex-direction: column;
+
+//       .aiAvatarSelectionContainer{
+//           display: flex;
+//           gap: 20px;
+
+//           .aiAvatar{
+//               width: 110px;
+//               height: 110px;
+//               cursor: pointer;
+
+//               img{
+//                   width: 100%;
+//                   height: 100%;
+//                   object-fit: cover;
+//                   border-radius: 50%;
+//               }
+//           }
+
+//           .aiAvatarLoadMore{
+//               width: 110px;
+//               height: 110px;
+//               background-color: lightgray;
+//               display: flex;
+//               align-items: center;
+//               justify-content: center;
+//               border-radius: 40%;
+//               font-size: 40px;
+//               color: grey;
+//               cursor: pointer;
+//           }
+
+//           .aiAvatarDisplay{
+//             display: flex;
+//             gap: 20px;
+//           }
+//       }
+
+//       .aiAvatarSelectedAvatar{
+//           width: 210px;
+//           height: 210px;
+//           cursor: pointer;
+//       }
+//       video{
+//         width: 100%;
+//         height: 100%;
+//         object-fit: cover;
+//         border-radius: 50%;
+//     }
+//   }
+//   .aiAvatarAppChatAndPresentationContainer{
+//       padding: 20px;
+//       flex: 2;
+//   }
+// }
+
+.aiAvatarAppMainContainer {
   margin: 50px 50px;
   display: flex;
 
-  .aiAvatarAppMenu{
-      padding: 20px;
-      flex: 1;
-      border-right: 1px solid lightgray;
-      height: 87vh;
+  .aiAvatarAppMenu {
+    padding: 20px;
+    flex: 1;
+    border-right: 1px solid lightgray;
+    height: 87vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+
+    .aiAvatarSelectionContainer {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-direction: column;
+      gap: 15px; /* Reduced gap for better alignment with smaller avatars */
 
-      .aiAvatarSelectionContainer{
-          display: flex;
-          gap: 20px;
+      .aiAvatar {
+        width: 90px; /* Reduced size */
+        height: 90px;
+        cursor: pointer;
+        transition: all 0.3s ease; /* Smooth transition for hover and selection */
 
-          .aiAvatar{
-              width: 110px;
-              height: 110px;
-              cursor: pointer;
+        &.selectedAvatar {
+          border: 3px solid #4caf50; /* Highlight with a green border */
+          box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); /* Optional glow effect */
+          transform: scale(1.1); /* Slightly larger for emphasis */
+        }
 
-              img{
-                  width: 100%;
-                  height: 100%;
-                  object-fit: cover;
-                  border-radius: 50%;
-              }
-          }
-
-          .aiAvatarLoadMore{
-              width: 110px;
-              height: 110px;
-              background-color: lightgray;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              border-radius: 40%;
-              font-size: 40px;
-              color: grey;
-              cursor: pointer;
-          }
-
-          .aiAvatarDisplay{
-            display: flex;
-            gap: 20px;
-          }
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 50%;
+        }
       }
 
-      .aiAvatarSelectedAvatar{
-          width: 210px;
-          height: 210px;
-          cursor: pointer;
-
-          video{
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-              border-radius: 50%;
-          }
+      .aiAvatarLoadMore {
+        width: 90px; /* Matches the reduced size */
+        height: 90px;
+        background-color: lightgray;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%; /* Keep it circular */
+        font-size: 30px;
+        color: grey;
+        cursor: pointer;
       }
+
+      .aiAvatarDisplay {
+        display: flex;
+        gap: 15px;
+      }
+    }
+
+    .aiAvatarSelectedAvatar {
+      width: 190px; /* Adjusted size for consistency */
+      height: 190px;
+      cursor: pointer;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
   }
-  .aiAvatarAppChatAndPresentationContainer{
-      padding: 20px;
-      flex: 2;
+
+  .aiAvatarAppChatAndPresentationContainer {
+    padding: 20px;
+    flex: 2;
   }
 }
+
 
 .subjects-container {
   width: 300px;
@@ -89,17 +166,26 @@
   }
 
   .subjects {
+    display: flex;
+    flex-direction: column;
+
     .subject {
       padding: 8px 8px;
       border-bottom: 1px solid #eee;
       cursor: pointer;
 
-      &:hover{
-          background-color: lightgray;
+      &:hover {
+        background-color: lightgray;
       }
 
       &:last-child {
         border-bottom: none;
+      }
+
+      &.Selected {
+        background-color: #4CAF50; /* Highlight color */
+        color: white; /* Text color change for contrast */
+        border: 2px solid #388E3C; /* Optional: Border to match highlight */
       }
 
       .subject-header {
@@ -137,6 +223,23 @@
 
 
 .aiAvatarAppChatAndPresentationContainer{
+
+  .generateContentButton {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #333;
+    background-color: lightgray;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .generateContentButton:hover {
+    background-color: #0056b3;
+  }
+
   .aiAvatarUserprofile{
       width: 50px;
       height: 50px;
