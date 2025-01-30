@@ -17,13 +17,15 @@ const ChatInterface = () => {
   const handleSend = async () => {
     if (!userMessage.trim()) return;
   
+    let tempMessage = userMessage
+    setUserMessage("")
     // Add user's message to chat history
-    setChatHistory((prev) => [...prev, { type: "user", message: userMessage }]);
+    setChatHistory((prev) => [...prev, { type: "user", message: tempMessage }]);
   
     try {
       // Send user's message to the API
       const response = await axios.post("http://127.0.0.1:8000/chat", {
-        message: userMessage,
+        message: tempMessage,
       });
   
       // Add system's response to chat history

@@ -1,20 +1,15 @@
 import { useRef, useEffect, useState } from "react";
 import "./App.scss";
-import profile from "./assets/profile.jpg";
 import userProfile from "./assets/userprofile.jpg";
-import send from "./assets/send.png";
 import ReactGoogleSlides from "react-google-slides";
 import axios from "axios";
 import ChatInterface from "./components/ChatInterface";
+import { MutatingDots } from 'react-loader-spinner'
 
 const App = () => {
   const [subjects, setSubjects] = useState([]);
   const [avatars, setAvatars] = useState([]);
   const [avatarImages, setAvatarImages] = useState({});
-  const [chatHistory, setChatHistory] = useState([
-    { type: "system", message: "Hi, how can I assist you?" },
-  ]);
-  const [userMessage, setUserMessage] = useState("");
   const videoRef = useRef(null);
 
   const [selectedAvatar, setSelectedAvatar] = useState(null);
@@ -24,6 +19,9 @@ const App = () => {
     "https://docs.google.com/presentation/d/14MYxUdP9iHuxCl_KvygR345BpEBd-0JMNO3YwtODHS_k/edit" // Default presentation link
   );
   const [slide_automation_time, setSlideAutomationTime] = useState(6000);
+  const [loader, setLoader] = useState(false);
+  const [showPresentationContainer, setShowPresentationContainer] = useState(false)
+
 
   useEffect(() => {
     const video = videoRef.current;
@@ -89,10 +87,13 @@ const App = () => {
       const url = `${baseUrl}/${name}/${subject}`;
       console.log(url);
 
+      setLoader(true)
       const response = await axios.get(url, {
         sessionData: "some data if required",
       });
 
+      setLoader(false)
+      setShowPresentationContainer(true)
       if (response.data) {
         const { videoUrl, slideUrl, slideAutomationTime } = response.data;
         console.log(response.data);
@@ -111,38 +112,8 @@ const App = () => {
         }
       }
     } catch (error) {
+      setLoader(false)
       console.error("Error starting session:", error);
-    }
-  };
-
-  const handleSend = async () => {
-    if (!userMessage.trim()) return;
-
-    // Add user's message to chat history
-    setChatHistory((prev) => [...prev, { type: "user", message: userMessage }]);
-
-    try {
-      // Send user's message to the API
-      const response = await axios.post("http://127.0.0.1:8000/chat", {
-        message: userMessage,
-      });
-
-      // Add system's response to chat history
-      setChatHistory((prev) => [
-        ...prev,
-        { type: "system", message: response.data.reply },
-      ]);
-    } catch (error) {
-      console.error("Error sending message:", error);
-      setChatHistory((prev) => [
-        ...prev,
-        {
-          type: "system",
-          message: "Sorry, something went wrong. Please try again later.",
-        },
-      ]);
-    } finally {
-      setUserMessage("");
     }
   };
 
@@ -200,16 +171,30 @@ const App = () => {
             </div>
           </div>
           <div className="generateContent">
-            <button
+            {showPresentationContainer === false && <button
               onClick={() => handleStartSession()}
               className="generateContentButton"
             >
               Start Session
-            </button>
+            </button>}
           </div>
         </div>
-        <div className="line-separator"></div>
         <div className="aiAvatarAppChatAndPresentationContainer">
+          {loader && 
+          <div className="loaderWrapper"> 
+            <MutatingDots
+                visible={true}
+                height="100"
+                width="100"
+                color="#4fa94d"
+                secondaryColor="#4fa94d"
+                radius="12.5"
+                ariaLabel="mutating-dots-loading"
+                wrapperStyle={{}}
+                wrapperClass=""
+            />
+          </div>
+         }
           <div className="headerContainer">
             <div className="aiAvatarUserprofile">
               <img src={userProfile} alt="avatar" />
@@ -217,15 +202,16 @@ const App = () => {
           </div>
 
           <div className="aiAvatarPresentationView">
-            <ReactGoogleSlides
-              width={650}
-              height={450}
-              slidesLink={slidesLink}
-              slideDuration={slide_automation_time}
-              position={1}
-              showControls
-              loop
-            />
+            { <div style={{visibility: showPresentationContainer ? "visible" : "hidden",}}>
+              <ReactGoogleSlides
+                width={850}
+                height={550}
+                slidesLink={slidesLink}
+                slideDuration={slide_automation_time}
+                position={1}
+                showControls
+                loop
+              /></div>}
           </div>
 
           <div className="aiAvatarSelectedAvatarContainer">
@@ -236,7 +222,7 @@ const App = () => {
             </div>
           </div>
 
-          <ChatInterface />
+          {showPresentationContainer && <ChatInterface />}
         </div>
       </div>
     </div>

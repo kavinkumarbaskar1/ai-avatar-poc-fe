@@ -4,74 +4,6 @@
   box-sizing: border-box;
 }
 
-// .aiAvatarAppMainContainer{
-//   margin: 50px 50px;
-//   display: flex;
-
-//   .aiAvatarAppMenu{
-//       padding: 20px;
-//       flex: 1;
-//       border-right: 1px solid lightgray;
-//       height: 87vh;
-//       display: flex;
-//       align-items: center;
-//       justify-content: space-between;
-//       flex-direction: column;
-
-//       .aiAvatarSelectionContainer{
-//           display: flex;
-//           gap: 20px;
-
-//           .aiAvatar{
-//               width: 110px;
-//               height: 110px;
-//               cursor: pointer;
-
-//               img{
-//                   width: 100%;
-//                   height: 100%;
-//                   object-fit: cover;
-//                   border-radius: 50%;
-//               }
-//           }
-
-//           .aiAvatarLoadMore{
-//               width: 110px;
-//               height: 110px;
-//               background-color: lightgray;
-//               display: flex;
-//               align-items: center;
-//               justify-content: center;
-//               border-radius: 40%;
-//               font-size: 40px;
-//               color: grey;
-//               cursor: pointer;
-//           }
-
-//           .aiAvatarDisplay{
-//             display: flex;
-//             gap: 20px;
-//           }
-//       }
-
-//       .aiAvatarSelectedAvatar{
-//           width: 210px;
-//           height: 210px;
-//           cursor: pointer;
-//       }
-//       video{
-//         width: 100%;
-//         height: 100%;
-//         object-fit: cover;
-//         border-radius: 50%;
-//     }
-//   }
-//   .aiAvatarAppChatAndPresentationContainer{
-//       padding: 20px;
-//       flex: 2;
-//   }
-// }
-
 .headerContainer {
   display: flex;
   justify-content: space-between; /* This ensures spacing between the children */
@@ -118,7 +50,7 @@
 .aiAvatarAppMainContainer {
   margin: 50px 50px;
   display: flex;
-  gap: 150px;
+  gap: 10rem;
 
   .aiAvatarAppMenu {
     padding: 20px;
@@ -129,7 +61,7 @@
     align-items: center;
     justify-content: space-between;
     flex-direction: column;
-
+    border-right: 1px solid lightgray;
     .aiAvatarSelectionContainer {
       display: flex;
       gap: 15px; /* Reduced gap for better alignment with smaller avatars */
@@ -144,6 +76,7 @@
           border: 3px solid #4caf50; 
           box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); 
           transform: scale(1.1); 
+          border-radius: 50%;
         }
 
         img {
@@ -182,15 +115,6 @@
   }
 }
 
-.line-separator {
-  width: 100%; /* Full width of the container */
-  height: 2px; /* Line height */
-  background-color: lightgray; /* Line color */
-  margin: 20px 0; /* Space around the line */
-  position: relative; /* Ensure the line is not hidden by other elements */
-  z-index: 1; /* Ensure it's in front if anything overlaps */
-}
-
 .subjects-container {
   width: 300px;
   border: 1px solid #ddd;
@@ -216,7 +140,7 @@
       cursor: pointer;
 
       &:hover {
-        background-color: lightgray;
+        background-color: rgb(206, 243, 206);
       }
 
       &:last-child {
@@ -224,9 +148,14 @@
       }
 
       &.Selected {
-        background-color: #4CAF50; /* Highlight color */
+        background-color: rgb(206, 243, 206); /* Highlight color */
         color: white; /* Text color change for contrast */
-        border: 2px solid #388E3C; /* Optional: Border to match highlight */
+        box-shadow: 0 0 10px rgba(206, 243, 206, 0.2);
+
+        .subject-header .star-icon {
+          font-size: 16px;
+          color: green;
+        }
       }
 
       .subject-header {
@@ -298,6 +227,8 @@
   border-radius: 15px;
   align-items: center;
   justify-content: center;
+  min-width: 750px;
+  margin: auto;
 }
 
 .headerContainer {
@@ -311,4 +242,11 @@
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+
+.loaderWrapper{
+  position: fixed;
+  top: 50%;
+  right: 30%;
 }
