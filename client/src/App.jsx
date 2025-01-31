@@ -1,10 +1,13 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useContext } from "react";
 import "./App.scss";
 import userProfile from "./assets/userprofile.jpg";
 import ReactGoogleSlides from "react-google-slides";
 import axios from "axios";
-import ChatInterface from "./components/ChatInterface";
+import ChatInterface from "./components/chatInterface/ChatInterface";
 import { MutatingDots } from 'react-loader-spinner'
+import Avatar from "./components/avatar/Avatar";
+import RealtimeChat from "./components/realtimeChat/RealtimeChat";
+import { AvatarContext } from "./context/AvatarContext";
 
 const App = () => {
   const [subjects, setSubjects] = useState([]);
@@ -12,7 +15,6 @@ const App = () => {
   const [avatarImages, setAvatarImages] = useState({});
   const videoRef = useRef(null);
 
-  const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [videoUrl, setVideoUrl] = useState(""); // State for the video URL
   const [slidesLink, setSlidesLink] = useState(
@@ -21,23 +23,12 @@ const App = () => {
   const [slide_automation_time, setSlideAutomationTime] = useState(6000);
   const [loader, setLoader] = useState(false);
   const [showPresentationContainer, setShowPresentationContainer] = useState(false)
+  const [isLiveChat, setIsLiveChat] = useState(false);
+  const { setAvatarSpeechText, currentAvatar, setCurrentAvatar, setPreviousAvatar } = useContext(AvatarContext)
 
-
-  useEffect(() => {
-    const video = videoRef.current;
-
-    // Start video muted, then unmute programmatically
-    video.muted = false;
-    video
-      .play()
-      .then(() => {
-        video.muted = false;
-      })
-      .catch((error) => {
-        console.log("Autoplay failed:", error);
-      });
-  }, []);
-
+  /**
+   * Side effect to fetch subjects from backend
+   */
   useEffect(() => {
     const fetchSubjects = async () => {
       const response = await axios.get("http://127.0.0.1:8000/subjects");
@@ -47,15 +38,49 @@ const App = () => {
     fetchSubjects();
   }, []);
 
+  /**
+   * Side effect to fetch avatar from backend
+   */
   useEffect(() => {
-    const fetchAvatars = async () => {
-      const response = await axios.get("http://127.0.0.1:8000/avatar");
-      setAvatars(response.data);
-    };
+    // const fetchAvatars = async () => {
+      // const response = await axios.get("http://127.0.0.1:8000/avatar");
+      // setAvatars(response.data);
+      setAvatars([
+        {
+          avatarName: "Lisa",
+          avatarVoice: "en-US-AvaultilingualNeural",
+          avatarStyle: "casual-sitting"
+        },
+        {
+          avatarName: "Harry",
+          avatarVoice: "en-US-AndrewMultilingualNeural",
+          avatarStyle: "youthful"
+        },
+        {
+          avatarName: "Jeff",
+          avatarVoice: "en-US-BrandonMultilingualNeural",
+          avatarStyle: "formal"
+        },
+        {
+          avatarName: "Max",
+          avatarVoice: "en-US-BrianMultilingualNeural",
+          avatarStyle: "casual"
+        },
+        {
+          avatarName: "Lori",
+          avatarVoice: "en-US-EmmaMultilingualNeural",
+          avatarStyle: "formal"
+        }
+      ])
+      // setAvatars(["Lisa", "Harry", "Jeff", "Max", "Lori"])
+    // };
 
-    fetchAvatars();
+    // fetchAvatars();
   }, []);
 
+  /**
+   * Side effect to load avatar images
+   */
   useEffect(() => {
     const avatarFiles = import.meta.glob("./assets/avatars/*.png");
     console.log(avatarFiles);
@@ -73,16 +98,21 @@ const App = () => {
     loadImages();
   }, []);
 
+  
+
+  /**
+   * Async Function to handle start session
+   */
   const handleStartSession = async () => {
     try {
-      if (!selectedAvatar || !selectedSubject) {
+      if (!currentAvatar || !selectedSubject) {
         alert(
           "Please select both an avatar and a subject before starting the session."
         );
         return;
       }
       const baseUrl = "http://127.0.0.1:8000/generate/google-slide";
-      const name = selectedAvatar;
+      const name = currentAvatar.avatarName;
       const subject = selectedSubject;
       const url = `${baseUrl}/${name}/${subject}`;
       console.log(url);
@@ -110,6 +140,7 @@ const App = () => {
         } else {
           console.error("Presentation URL not found in the response");
         }
+        setAvatarSpeechText("Hello Abhishek nice to meet you hope you have nice day")
       }
     } catch (error) {
       setLoader(false)
@@ -117,10 +148,24 @@ const App = () => {
     }
   };
 
+  /**
+   * 
+   * Function to handle avatar select
+   * 
+   * @param {*} avatar 
+   */
   const handleAvatarClick = (avatar) => {
-    setSelectedAvatar(avatar);
+    setPreviousAvatar(currentAvatar)
+    setCurrentAvatar(avatar)
+    if(!isLiveChat) setIsLiveChat(true);
     console.log("Selected Avatar:", avatar);
   };
+
+  /**
+   * Function to handle subject click
+   * 
+   * @param {*} subject 
+   */
   const handleSubjectClick = (subject) => {
     setSelectedSubject(subject);
     console.log("Selected subject:", subject);
@@ -133,16 +178,16 @@ const App = () => {
           <div className="aiAvatarSelectionContainer">
             <div className="aiAvatarDisplay">
               {avatars.slice(0, 5).map((avatar, index) => {
-                const avatarImage = avatarImages[`${avatar}Profile`];
+                const avatarImage = avatarImages[`${avatar.avatarName}Profile`];
                 return (
                   <div
                     key={index}
                     className={`aiAvatar${
-                      selectedAvatar === avatar ? " selectedAvatar" : ""
+                      currentAvatar?.avatarName === avatar.avatarName ? " selectedAvatar" : ""
                     }`}
                     onClick={() => handleAvatarClick(avatar)}
                   >
-                    <img src={avatarImage} alt={avatar} />
+                    <img src={avatarImage} alt={avatar.avatarName} />
                   </div>
                 );
               })}
@@ -171,12 +216,31 @@ const App = () => {
             </div>
           </div>
           <div className="generateContent">
-            {showPresentationContainer === false && <button
-              onClick={() => handleStartSession()}
+            {/* {!showPresentationContainer && <button
+              onClick={handleStartSession}
               className="generateContentButton"
             >
               Start Session
-            </button>}
+            </button>} */}
+
+            <button
+              onClick={handleStartSession}
+              className="generateContentButton"
+            >
+              Start Session
+            </button>
+
+            <button
+              onClick={() => setAvatarSpeechText("Hello Kavya nice to meet you")}
+              className="generateContentButton"
+            >
+              speak Session
+            </button>
+
+            {/* {showPresentationContainer && <div>
+                <button>New Character Assign</button>
+                <button>Stop Session</button>
+              </div>} */}
           </div>
         </div>
         <div className="aiAvatarAppChatAndPresentationContainer">
@@ -204,8 +268,8 @@ const App = () => {
           <div className="aiAvatarPresentationView">
             { <div style={{visibility: showPresentationContainer ? "visible" : "hidden",}}>
               <ReactGoogleSlides
-                width={850}
-                height={550}
+                width={750}
+                height={450}
                 slidesLink={slidesLink}
                 slideDuration={slide_automation_time}
                 position={1}
@@ -215,14 +279,11 @@ const App = () => {
           </div>
 
           <div className="aiAvatarSelectedAvatarContainer">
-            <div className="aiAvatarSelectedAvatar">
-              <video ref={videoRef} src={videoUrl} autoPlay muted={false}>
-                Your browser does not support the video tag.
-              </video>
-            </div>
+              <Avatar isLiveChat={isLiveChat}></Avatar>
           </div>
 
-          {showPresentationContainer && <ChatInterface />}
+          {/* {showPresentationContainer && <ChatInterface />} */}
+          <RealtimeChat/>
         </div>
       </div>
     </div>

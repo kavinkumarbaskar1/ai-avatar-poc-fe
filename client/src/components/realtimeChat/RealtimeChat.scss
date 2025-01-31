@@ -1,0 +1,30 @@
+.realtime-container {
+    position: fixed;
+    bottom: 4rem;
+    right: 3rem;
+    z-index: 1000;
+  }
+  
+  .hand {
+    font-size: 30px;
+    cursor: pointer;
+    
+    color: white;
+    width: 60px; /* Ensure icon is a perfect circle */
+    height: 60px;
+    border-radius: 50%; /* Makes it round */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+  
+    &.raise{
+      background-color: #4caf50;
+    }
+  
+    &.down{
+      background-color: #a7eca9;
+    }
+  }
+  

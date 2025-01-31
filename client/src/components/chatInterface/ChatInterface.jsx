@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./ChatInterface.scss";
-import send from "../assets/send.png";
+import send from "../../assets/send.png";
 
 const ChatInterface = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
