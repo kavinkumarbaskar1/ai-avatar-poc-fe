@@ -16,10 +16,10 @@ const Avatar = ({ isLiveChat }) => {
   const [isAvatarActive, setIsAvatarActive] = useState(false)
   const myAvatarVideoEleRef = useRef();
   const myAvatarAudioEleRef = useRef();
-  const iceUrl = "turn:relay.communication.microsoft.com:3478";
-  const iceUsername = "BQAANlTgDIAB23g5JQDn6S8cYlJM2QFcSDwQGQ/yNB4AAAAQAxC6Y2laD2dOgrYx1Zk1SkZ9oBNrGsYpooJuxaPlRUha7cTA14w=";
-  const iceCredential = "qYPDM3gfQpc0iC0TE+qX1bZbB3Y=";
-  const { avatarSpeechText, setSelectedAvatarSynthesizer, currentAvatar, setCurrentAvatar, previousAvatar, setPreviousAvatar  } = useContext(AvatarContext);
+  const iceUrl = import.meta.env.VITE_ICE_URL;
+  const iceUsername = import.meta.env.VITE_ICE_USERNAME;
+  const iceCredential = import.meta.env.VITE_ICE_CREDENTIAL;
+  const { avatarSpeechText, setAvatarSpeechText, setSelectedAvatarSynthesizer, currentAvatar, previousAvatar, currentSlide, setCurrentSlide, slides, isHandRaise, isHandRaiseRef  } = useContext(AvatarContext);
 
   useEffect(() => {
     if (isLiveChat && isAvatarActive && (previousAvatar !== currentAvatar)){
@@ -81,6 +81,12 @@ const Avatar = ({ isLiveChat }) => {
         }
         if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
           console.log("[" + (new Date()).toISOString() + "] Speech synthesized to speaker for text [ " + text + " ]. Result ID: " + result.resultId)
+          if((currentSlide <= slides.length) && (!isHandRaiseRef.current)){
+            let tempSlide = currentSlide+1
+            setCurrentSlide(tempSlide)
+            //alert(slides[tempSlide-1].slide)
+            setAvatarSpeechText(slides[tempSlide-1].slide)
+          } 
         }
       })
       .catch((error) => {

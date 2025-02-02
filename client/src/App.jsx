@@ -20,11 +20,11 @@ const App = () => {
   const [slidesLink, setSlidesLink] = useState(
     "https://docs.google.com/presentation/d/14MYxUdP9iHuxCl_KvygR345BpEBd-0JMNO3YwtODHS_k/edit" // Default presentation link
   );
-  const [slide_automation_time, setSlideAutomationTime] = useState(6000);
+  const [slide_automation_time, setSlideAutomationTime] = useState(100000);
   const [loader, setLoader] = useState(false);
   const [showPresentationContainer, setShowPresentationContainer] = useState(false)
   const [isLiveChat, setIsLiveChat] = useState(false);
-  const { setAvatarSpeechText, currentAvatar, setCurrentAvatar, setPreviousAvatar } = useContext(AvatarContext)
+  const { setAvatarSpeechText, currentAvatar, setCurrentAvatar, setPreviousAvatar, currentSlide, setCurrentSlide, slides, setSlides } = useContext(AvatarContext)
 
   /**
    * Side effect to fetch subjects from backend
@@ -48,7 +48,7 @@ const App = () => {
       setAvatars([
         {
           avatarName: "Lisa",
-          avatarVoice: "en-US-AvaultilingualNeural",
+          avatarVoice: "en-US-AvaMultilingualNeural",
           avatarStyle: "casual-sitting"
         },
         {
@@ -98,6 +98,10 @@ const App = () => {
     loadImages();
   }, []);
 
+  useEffect(() => {
+
+  },[currentSlide])
+
   
 
   /**
@@ -124,23 +128,67 @@ const App = () => {
 
       setLoader(false)
       setShowPresentationContainer(true)
+
+      const slidesResponse = [
+        {
+          slide: "Hello all, i'm avatar",
+          summary: "summary for slide0 "  
+        },
+        {
+          slide : "Data Science is an interdisciplinary field ",
+          summary : "Summary for slide1 Data Science is an interdisciplinary field "
+        },
+        {
+          slide : "Data refers to raw facts, figures, or information collected from various sources. ",
+          summary : "Summary for slide2 Data refers to raw facts, figures, or information collected from various sources."
+        },
+        {
+          slide : "Data Collection: Gathering data from sources like surveys, sensors, or databases",
+          summary : "Summary for slide3 Data Collection: Gathering data from sources like surveys, sensors, or databases"
+        },
+        {
+          slide : "Predicting house prices: Using historical data on house features ",
+          summary : "Summary for slide4 Predicting house prices: Using historical data on house features"
+        },
+        {
+          slide : "Data Science is used in various industries",
+          summary : "Summary for slide5 Data Science is used in various industries"
+        },
+        // {
+        //   slide: "Data Science is a powerful tool for solving real-world problems",
+        //   summary: "summary for slide6 Data Science is a powerful tool for solving real-world problems"
+        // }
+      ]
+
+
       if (response.data) {
         const { videoUrl, slideUrl, slideAutomationTime } = response.data;
         console.log(response.data);
 
-        if (videoUrl) {
-          setVideoUrl(videoUrl);
-          setSlideAutomationTime(slideAutomationTime);
-        } else {
-          console.error("Video URL not found in the response");
-        }
+        // if (videoUrl) {
+        //   setVideoUrl(videoUrl);
+        //   setSlideAutomationTime(slideAutomationTime);
+        // } else {
+        //   console.error("Video URL not found in the response");
+        // }
+
+        
 
         if (slideUrl) {
           setSlidesLink(slideUrl);
         } else {
           console.error("Presentation URL not found in the response");
         }
-        setAvatarSpeechText("Hello Abhishek nice to meet you hope you have nice day")
+        // setAvatarSpeechText("Hello Abhishek nice to meet you hope you have nice day")
+
+        if(videoUrl) {
+          setCurrentSlide(1)
+          setSlides(slidesResponse)
+          setAvatarSpeechText(slidesResponse[0].slide)
+          // setTimeout(() => {
+            // setCurrentSlide(currentSlide)
+          // }, 2000);
+        }
       }
     } catch (error) {
       setLoader(false)
@@ -230,12 +278,12 @@ const App = () => {
               Start Session
             </button>
 
-            <button
+            {/* <button
               onClick={() => setAvatarSpeechText("Hello Kavya nice to meet you")}
               className="generateContentButton"
             >
               speak Session
-            </button>
+            </button> */}
 
             {/* {showPresentationContainer && <div>
                 <button>New Character Assign</button>
@@ -272,9 +320,9 @@ const App = () => {
                 height={450}
                 slidesLink={slidesLink}
                 slideDuration={slide_automation_time}
-                position={1}
-                showControls
-                loop
+                position={currentSlide}
+                // showControls
+                // loop
               /></div>}
           </div>
 

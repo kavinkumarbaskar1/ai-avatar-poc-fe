@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 
 export const AvatarContext = createContext();
 
@@ -15,6 +15,19 @@ export const AvatarProvider = ({ children }) => {
   const [selectedAvatarSynthesizer, setSelectedAvatarSynthesizer] = useState(null);
   const [currentAvatar, setCurrentAvatar] = useState()
   const [previousAvatar, setPreviousAvatar] = useState()
+  const [currentSlide, setCurrentSlide] = useState(1)
+  const [slides, setSlides] = useState()
+  const isHandRaiseRef = useRef(isHandRaise);
+
+  useEffect(() => {
+    isHandRaiseRef.current = isHandRaise
+  },[isHandRaise])
+
+  const updateIsHandRaise= (value) => {
+    isHandRaiseRef.current = value; // Instantly updates ref
+    setIsHandRaise(value); // Triggers re-render asynchronously
+    console.log("Instant value:", isHandRaiseRef.current);
+  };
  
 
   return (
@@ -23,7 +36,10 @@ export const AvatarProvider = ({ children }) => {
         isHandRaise, setIsHandRaise, 
         selectedAvatarSynthesizer, setSelectedAvatarSynthesizer, 
         currentAvatar, setCurrentAvatar,
-        previousAvatar, setPreviousAvatar }}>
+        previousAvatar, setPreviousAvatar,
+        currentSlide, setCurrentSlide,
+        slides, setSlides,
+        isHandRaiseRef, updateIsHandRaise}}>
       {children}
     </AvatarContext.Provider>
   );

@@ -1,6 +1,6 @@
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
-const cogSvcRegion = "westus2";
-const cogSvcSubKey = "Dv89x4khYEbliHuTjpDGD00sItZOBHjWXuLy2Cq4XPpmIbXi6GL5JQQJ99BAAC8vTInXJ3w3AAAYACOGR7kl";
+const cogSvcRegion = import.meta.env.VITE_REACT_APP_COGSVCREGION;
+const cogSvcSubKey = import.meta.env.VITE_REACT_APP_COGSVCSUBKEY;
 const voiceName = "en-US-AvaMultilingualNeural"
 const avatarCharacte1 = "Jeff"
 const avatarStyle = "formal"
