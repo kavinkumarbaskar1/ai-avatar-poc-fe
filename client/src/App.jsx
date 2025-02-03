@@ -1,52 +1,76 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useContext } from "react";
 import "./App.scss";
 import userProfile from "./assets/userprofile.jpg";
 import ReactGoogleSlides from "react-google-slides";
 import axios from "axios";
-import ChatInterface from "./components/ChatInterface";
 import { MutatingDots } from 'react-loader-spinner'
+import Avatar from "./components/avatar/Avatar";
+import RealtimeChat from "./components/realtimeChat/RealtimeChat";
+import { AvatarContext } from "./context/AvatarContext";
+
+const avatarsResponse = [
+  {
+    avatarName: "Lisa",
+    avatarVoice: "en-US-AvaMultilingualNeural",
+    avatarStyle: "casual-sitting"
+  },
+  {
+    avatarName: "Harry",
+    avatarVoice: "en-US-AndrewMultilingualNeural",
+    avatarStyle: "youthful"
+  },
+  {
+    avatarName: "Jeff",
+    avatarVoice: "en-US-BrandonMultilingualNeural",
+    avatarStyle: "formal"
+  },
+  {
+    avatarName: "Max",
+    avatarVoice: "en-US-BrianMultilingualNeural",
+    avatarStyle: "casual"
+  },
+  {
+    avatarName: "Lori",
+    avatarVoice: "en-US-EmmaMultilingualNeural",
+    avatarStyle: "formal"
+  }
+] 
 
 const App = () => {
   const [subjects, setSubjects] = useState([]);
-  const [avatars, setAvatars] = useState([]);
-  const [avatarImages, setAvatarImages] = useState({});
-  const videoRef = useRef(null);
-
-  const [selectedAvatar, setSelectedAvatar] = useState(null);
-  const [selectedSubject, setSelectedSubject] = useState(null);
-  const [videoUrl, setVideoUrl] = useState(""); // State for the video URL
+  const [avatars, setAvatars] = useState([])
+  const [avatarImages, setAvatarImages] = useState({})
+  const [selectedSubject, setSelectedSubject] = useState(null)
   const [slidesLink, setSlidesLink] = useState(
     "https://docs.google.com/presentation/d/14MYxUdP9iHuxCl_KvygR345BpEBd-0JMNO3YwtODHS_k/edit" // Default presentation link
   );
-  const [slide_automation_time, setSlideAutomationTime] = useState(6000);
+  const [slide_automation_time, setSlideAutomationTime] = useState(100000);
   const [loader, setLoader] = useState(false);
   const [showPresentationContainer, setShowPresentationContainer] = useState(false)
+  const [isLiveChat, setIsLiveChat] = useState(false);
+  const { setAvatarSpeechText, currentAvatar, setCurrentAvatar, 
+    setPreviousAvatar, currentSlide, setCurrentSlide, 
+    setSlideScripts, isSubjectContainerDisabled, 
+    setIsSubjectContainerDisabled, selectedAvatarSynthesizer, 
+    setSelectedAvatarSynthesizer, isSessionRestarted, setIsSessionRestarted ,
+    slideScripts
+  } = useContext(AvatarContext)
 
-
-  useEffect(() => {
-    const video = videoRef.current;
-
-    // Start video muted, then unmute programmatically
-    video.muted = false;
-    video
-      .play()
-      .then(() => {
-        video.muted = false;
-      })
-      .catch((error) => {
-        console.log("Autoplay failed:", error);
-      });
-  }, []);
-
+  /**
+   * Side effect to fetch subjects from backend
+   */
   useEffect(() => {
     const fetchSubjects = async () => {
-      const response = await axios.get("http://127.0.0.1:8000/subjects");
-      setSubjects(response.data); // Assuming the response data is the array of subjects
+      const response = await axios.get("http://127.0.0.1:8000/subjects")
+      setSubjects(response.data) // Assuming the response data is the array of subjects
     };
 
-    fetchSubjects();
-  }, []);
+    fetchSubjects()
+  }, [])
 
+  /**
+   * Side effect to fetch avatar from backend
+   */
   useEffect(() => {
     const fetchAvatars = async () => {
       const response = await axios.get("http://127.0.0.1:8000/avatar");
@@ -56,6 +80,9 @@ const App = () => {
     fetchAvatars();
   }, []);
 
+  /**
+   * Side effect to load avatar images
+   */
   useEffect(() => {
     const avatarFiles = import.meta.glob("./assets/avatars/*.png");
     console.log(avatarFiles);
@@ -64,28 +91,38 @@ const App = () => {
       for (const path in avatarFiles) {
         const imageName = path
           .replace("./assets/avatars/", "")
-          .replace(/\.[^/.]+$/, "");
-        const imageModule = await avatarFiles[path]();
-        images[imageName] = imageModule.default;
+          .replace(/\.[^/.]+$/, "")
+        const imageModule = await avatarFiles[path]()
+        images[imageName] = imageModule.default
       }
-      setAvatarImages(images);
+      setAvatarImages(images)
     };
     loadImages();
   }, []);
 
+  useEffect(() => {
+
+  },[currentSlide])
+
+  
+
+  /**
+   * Async Function to handle start session
+   */
   const handleStartSession = async () => {
     try {
-      if (!selectedAvatar || !selectedSubject) {
+      if (!currentAvatar || !selectedSubject) {
         alert(
           "Please select both an avatar and a subject before starting the session."
         );
         return;
       }
-      const baseUrl = "http://127.0.0.1:8000/generate/google-slide";
-      const name = selectedAvatar;
+      const baseUrl = "http://127.0.0.1:8000/generation/slide-and-script"
+      const name = currentAvatar.avatarName;
       const subject = selectedSubject;
-      const url = `${baseUrl}/${name}/${subject}`;
+      const url = `${baseUrl}/${name}/${subject}`
       console.log(url);
+      setIsLiveChat(true)
 
       setLoader(true)
       const response = await axios.get(url, {
@@ -94,36 +131,93 @@ const App = () => {
 
       setLoader(false)
       setShowPresentationContainer(true)
-      if (response.data) {
-        const { videoUrl, slideUrl, slideAutomationTime } = response.data;
-        console.log(response.data);
 
-        if (videoUrl) {
-          setVideoUrl(videoUrl);
-          setSlideAutomationTime(slideAutomationTime);
-        } else {
-          console.error("Video URL not found in the response");
-        }
+      if (response.data) {
+        const { avatarSpeakingScript, slideUrl } = response.data
+        console.log(response.data);
 
         if (slideUrl) {
           setSlidesLink(slideUrl);
         } else {
-          console.error("Presentation URL not found in the response");
+          console.error("Presentation URL not found in the response")
         }
+
+        if(avatarSpeakingScript) {
+          setCurrentSlide(1)
+          setSlideScripts(avatarSpeakingScript)
+          setAvatarSpeechText(avatarSpeakingScript[0].slide)
+        }
+        setIsSubjectContainerDisabled(true)
       }
     } catch (error) {
       setLoader(false)
-      console.error("Error starting session:", error);
+      setIsSubjectContainerDisabled(false)
+      console.error("Error starting session:", error)
     }
   };
 
+  /**
+   * Function to handle stop session
+   */
+  const handleStopSession = () => {
+    handleStopSpeaking()
+    selectedAvatarSynthesizer.close()
+    setSelectedAvatarSynthesizer(null) 
+    setShowPresentationContainer(false)
+    setIsLiveChat(false)
+    setIsSessionRestarted(false)
+  }
+
+  /**
+   * Function to handle stop speaking 
+   */
+  const handleStopSpeaking = () => {
+    selectedAvatarSynthesizer.stopSpeakingAsync().then(
+      console.log("[" + (new Date()).toISOString() + "] Stop speaking request sent.")
+    ).catch((error) => {
+        selectedAvatarSynthesizer.close()
+        setSelectedAvatarSynthesizer(null) 
+    });
+  }
+
+  /**
+   * Function to handle restart session
+   */
+  const handleRestartSession = async () => {
+    const response = await axios.post(`http://127.0.0.1:8000/generation/script-character-change/${currentAvatar.avatarName}`, {
+      ...{slideScripts}
+    });
+
+    if(response.data){
+      setSlideScripts(response.data.avatarSpeakingScript)
+      setAvatarSpeechText(response.data.avatarSpeakingScript[currentSlide-1].slide)
+      setIsSessionRestarted(false)
+    } 
+  }
+
+  /**
+   * 
+   * Function to handle avatar select
+   * 
+   * @param {*} avatar 
+   */
   const handleAvatarClick = (avatar) => {
-    setSelectedAvatar(avatar);
-    console.log("Selected Avatar:", avatar);
+    setPreviousAvatar(currentAvatar)
+    setCurrentAvatar(avatar)
+    if(!isLiveChat) setIsLiveChat(true)
+    console.log("Selected Avatar:", avatar)
   };
+
+  /**
+   * Function to handle subject click
+   * 
+   * @param {*} subject 
+   */
   const handleSubjectClick = (subject) => {
-    setSelectedSubject(subject);
-    console.log("Selected subject:", subject);
+    if(!isSubjectContainerDisabled) {
+      setSelectedSubject(subject)
+      console.log("Selected subject:", subject)
+    }
   };
 
   return (
@@ -133,16 +227,16 @@ const App = () => {
           <div className="aiAvatarSelectionContainer">
             <div className="aiAvatarDisplay">
               {avatars.slice(0, 5).map((avatar, index) => {
-                const avatarImage = avatarImages[`${avatar}Profile`];
+                const avatarImage = avatarImages[`${avatar.avatarName}Profile`];
                 return (
                   <div
                     key={index}
                     className={`aiAvatar${
-                      selectedAvatar === avatar ? " selectedAvatar" : ""
+                      currentAvatar?.avatarName === avatar.avatarName ? " selectedAvatar" : ""
                     }`}
                     onClick={() => handleAvatarClick(avatar)}
                   >
-                    <img src={avatarImage} alt={avatar} />
+                    <img src={avatarImage} alt={avatar.avatarName} />
                   </div>
                 );
               })}
@@ -159,6 +253,7 @@ const App = () => {
                     selectedSubject === subject ? "Selected" : ""
                   }`} // Highlight selected subject
                   onClick={() => handleSubjectClick(subject)} // Set selected subject on click
+                  style={{cursor: showPresentationContainer ? "not-allowed" : "pointer"}}
                 >
                   <div className="subject-header">
                     <span className="star-icon">★</span>
@@ -171,12 +266,18 @@ const App = () => {
             </div>
           </div>
           <div className="generateContent">
-            {showPresentationContainer === false && <button
-              onClick={() => handleStartSession()}
-              className="generateContentButton"
+            {!showPresentationContainer && <button
+              onClick={handleStartSession}
+              className="generateContentButton start"
             >
               Start Session
             </button>}
+
+            {isSessionRestarted && <button className="generateContentButton restart" onClick={handleRestartSession}>Restart Session</button>}
+
+            {(showPresentationContainer && !isSessionRestarted ) && <div>
+                <button onClick={handleStopSession} className="generateContentButton stop">Stop Session</button>
+              </div>}
           </div>
         </div>
         <div className="aiAvatarAppChatAndPresentationContainer">
@@ -204,25 +305,22 @@ const App = () => {
           <div className="aiAvatarPresentationView">
             { <div style={{visibility: showPresentationContainer ? "visible" : "hidden",}}>
               <ReactGoogleSlides
-                width={850}
-                height={550}
+                width={750}
+                height={450}
                 slidesLink={slidesLink}
                 slideDuration={slide_automation_time}
-                position={1}
-                showControls
-                loop
+                position={currentSlide}
+                // showControls
+                // loop
               /></div>}
           </div>
 
           <div className="aiAvatarSelectedAvatarContainer">
-            <div className="aiAvatarSelectedAvatar">
-              <video ref={videoRef} src={videoUrl} autoPlay muted={false}>
-                Your browser does not support the video tag.
-              </video>
-            </div>
+              <Avatar isLiveChat={isLiveChat}></Avatar>
           </div>
 
-          {showPresentationContainer && <ChatInterface />}
+          {/* {showPresentationContainer && <ChatInterface />} */}
+          {showPresentationContainer && <RealtimeChat/>}
         </div>
       </div>
     </div>
