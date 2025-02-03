@@ -16,7 +16,9 @@ export const AvatarProvider = ({ children }) => {
   const [currentAvatar, setCurrentAvatar] = useState()
   const [previousAvatar, setPreviousAvatar] = useState()
   const [currentSlide, setCurrentSlide] = useState(1)
-  const [slides, setSlides] = useState()
+  const [slideScripts, setSlideScripts] = useState()
+  const [isSubjectContainerDisabled, setIsSubjectContainerDisabled] = useState(false)
+  const [isSessionRestarted, setIsSessionRestarted] = useState(false)
   const isHandRaiseRef = useRef(isHandRaise);
 
   useEffect(() => {
@@ -38,8 +40,10 @@ export const AvatarProvider = ({ children }) => {
         currentAvatar, setCurrentAvatar,
         previousAvatar, setPreviousAvatar,
         currentSlide, setCurrentSlide,
-        slides, setSlides,
-        isHandRaiseRef, updateIsHandRaise}}>
+        slideScripts, setSlideScripts,
+        isHandRaiseRef, updateIsHandRaise,
+        isSubjectContainerDisabled, setIsSubjectContainerDisabled,
+        isSessionRestarted, setIsSessionRestarted}}>
       {children}
     </AvatarContext.Provider>
   );
