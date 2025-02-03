@@ -19,7 +19,12 @@ const Avatar = ({ isLiveChat }) => {
   const iceUrl = import.meta.env.VITE_ICE_URL;
   const iceUsername = import.meta.env.VITE_ICE_USERNAME;
   const iceCredential = import.meta.env.VITE_ICE_CREDENTIAL;
-  const { avatarSpeechText, setAvatarSpeechText, setSelectedAvatarSynthesizer, currentAvatar, previousAvatar, currentSlide, setCurrentSlide, slides, isHandRaise, isHandRaiseRef  } = useContext(AvatarContext);
+  const { avatarSpeechText, setAvatarSpeechText, 
+    setSelectedAvatarSynthesizer, currentAvatar, 
+    previousAvatar, currentSlide, setCurrentSlide, 
+    slideScripts , isHandRaiseRef,
+    setIsSessionRestarted, isSubjectContainerDisabled,
+  } = useContext(AvatarContext);
 
   useEffect(() => {
     if (isLiveChat && isAvatarActive && (previousAvatar !== currentAvatar)){
@@ -81,12 +86,11 @@ const Avatar = ({ isLiveChat }) => {
         }
         if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
           console.log("[" + (new Date()).toISOString() + "] Speech synthesized to speaker for text [ " + text + " ]. Result ID: " + result.resultId)
-          if((currentSlide <= slides.length) && (!isHandRaiseRef.current)){
+          if((currentSlide <= slideScripts.length) && (!isHandRaiseRef.current)){
             let tempSlide = currentSlide+1
             setCurrentSlide(tempSlide)
-            //alert(slides[tempSlide-1].slide)
-            setAvatarSpeechText(slides[tempSlide-1].slide)
-          } 
+            setAvatarSpeechText(slideScripts[tempSlide-1].slide)
+          }
         }
       })
       .catch((error) => {
@@ -120,7 +124,6 @@ const Avatar = ({ isLiveChat }) => {
       ) {
         console.log("Azure Avatar service Disconnected");
         console.log("Too many character swtiches attempted within a minute, Switching back to previous avatar.Please try after a minute !")
-        // restartSessionWithPreviousCharacter()
       }
     };
 
@@ -154,12 +157,11 @@ const Avatar = ({ isLiveChat }) => {
   const restartSession = () => {
     stopSession()
     startSession(currentAvatar)
-  }
 
-  // const restartSessionWithPreviousCharacter = () => {
-  //   // stopSession()
-  //   startSession(previousAvatar)
-  // }
+    if(previousAvatar && currentAvatar && isSubjectContainerDisabled){
+      setIsSessionRestarted(true)
+    }
+  }
 
   return (
     <div className="container myAvatarContainer">

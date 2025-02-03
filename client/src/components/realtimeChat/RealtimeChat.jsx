@@ -2,6 +2,20 @@ import React, { useContext, useState } from 'react'
 import "./RealtimeChat.scss"
 import { AvatarContext } from '../../context/AvatarContext';
 import * as SpeechSDK from 'microsoft-cognitiveservices-speech-sdk';
+import axios from "axios";
+
+const sentences = [
+    "ah ah go ahead with your question",
+    "It seems you've raised your hand",
+    "go ahead, I'm listening",
+    "I see you've got something on your mind, ask away",
+    "looks like you have a question, feel free to ask",
+    "I'm all ears, what's your question?",
+    "I noticed your hand, go ahead and ask",
+    "feel free to ask, I'm ready for your question",
+    "I'm waiting for your question, go ahead",
+    "I can see you have something to ask, don't hesitate"
+  ];
 
 
 const RealtimeChat = () => {
@@ -10,7 +24,7 @@ const RealtimeChat = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [recognizer,setRecognizer] = useState(null);
   const [query, setQuery] = useState('');
-  const { updateIsHandRaise , selectedAvatarSynthesizer, setAvatarSpeechText, slides, currentSlide, setSelectedAvatarSynthesizer  } = useContext(AvatarContext);
+  const { updateIsHandRaise , selectedAvatarSynthesizer, setAvatarSpeechText, slideScripts, currentSlide, setSelectedAvatarSynthesizer, currentAvatar  } = useContext(AvatarContext);
 
 
   /**
@@ -18,6 +32,7 @@ const RealtimeChat = () => {
    */  
   const handRaise = () => {
     updateIsHandRaise(true)
+    setAvatarSpeechText(getRandomQuestionAcceptanceSentence())  
     if(selectedAvatarSynthesizer != null) stopSpeaking()
   }
 
@@ -26,7 +41,7 @@ const RealtimeChat = () => {
    */
   const handDown = () => {
     updateIsHandRaise(false)
-    setAvatarSpeechText(slides[currentSlide-1].summary)
+    setAvatarSpeechText(slideScripts[currentSlide-1].summary)
   }
 
   /**
@@ -54,6 +69,15 @@ const RealtimeChat = () => {
     });
   }
 
+  const sendQuery = async (query) => {
+    const requestBody = { query : query}
+    const response = await axios.post(`http://127.0.0.1:8000/realtime-chat/${currentAvatar.avatarName}`, { ...requestBody});
+
+    if(response.data) {
+        setAvatarSpeechText(response.data.script)
+    }
+  }
+
   /**
    * Function to handle microphone click
    */
@@ -63,7 +87,6 @@ const RealtimeChat = () => {
         recognizer.close();
         setIsRecording(false);
         setRecognizer(null);
-        // setCurrentSlide
       }
     } else {
       setIsRecording(true);
@@ -76,13 +99,22 @@ const RealtimeChat = () => {
       newRecognizer.recognizeOnceAsync(result => {
         setIsRecording(false);  
         setQuery(result?.text);
-        setAvatarSpeechText(result?.text)
-        // sendQuery(result?.text);
+        sendQuery(result?.text);
       }, error => {
           setIsRecording(false); 
       });
     }
   };
+
+  /**
+   * Function to get random question acceptance sentence
+   * 
+   * @returns sentence
+   */
+  function getRandomQuestionAcceptanceSentence() {
+    const randomIndex = Math.floor(Math.random() * sentences.length);
+    return sentences[randomIndex];
+  }
 
   return (
     <div className='realtime-container'>

@@ -3,20 +3,44 @@ import "./App.scss";
 import userProfile from "./assets/userprofile.jpg";
 import ReactGoogleSlides from "react-google-slides";
 import axios from "axios";
-import ChatInterface from "./components/chatInterface/ChatInterface";
 import { MutatingDots } from 'react-loader-spinner'
 import Avatar from "./components/avatar/Avatar";
 import RealtimeChat from "./components/realtimeChat/RealtimeChat";
 import { AvatarContext } from "./context/AvatarContext";
 
+const avatarsResponse = [
+  {
+    avatarName: "Lisa",
+    avatarVoice: "en-US-AvaMultilingualNeural",
+    avatarStyle: "casual-sitting"
+  },
+  {
+    avatarName: "Harry",
+    avatarVoice: "en-US-AndrewMultilingualNeural",
+    avatarStyle: "youthful"
+  },
+  {
+    avatarName: "Jeff",
+    avatarVoice: "en-US-BrandonMultilingualNeural",
+    avatarStyle: "formal"
+  },
+  {
+    avatarName: "Max",
+    avatarVoice: "en-US-BrianMultilingualNeural",
+    avatarStyle: "casual"
+  },
+  {
+    avatarName: "Lori",
+    avatarVoice: "en-US-EmmaMultilingualNeural",
+    avatarStyle: "formal"
+  }
+] 
+
 const App = () => {
   const [subjects, setSubjects] = useState([]);
-  const [avatars, setAvatars] = useState([]);
-  const [avatarImages, setAvatarImages] = useState({});
-  const videoRef = useRef(null);
-
-  const [selectedSubject, setSelectedSubject] = useState(null);
-  const [videoUrl, setVideoUrl] = useState(""); // State for the video URL
+  const [avatars, setAvatars] = useState([])
+  const [avatarImages, setAvatarImages] = useState({})
+  const [selectedSubject, setSelectedSubject] = useState(null)
   const [slidesLink, setSlidesLink] = useState(
     "https://docs.google.com/presentation/d/14MYxUdP9iHuxCl_KvygR345BpEBd-0JMNO3YwtODHS_k/edit" // Default presentation link
   );
@@ -24,58 +48,36 @@ const App = () => {
   const [loader, setLoader] = useState(false);
   const [showPresentationContainer, setShowPresentationContainer] = useState(false)
   const [isLiveChat, setIsLiveChat] = useState(false);
-  const { setAvatarSpeechText, currentAvatar, setCurrentAvatar, setPreviousAvatar, currentSlide, setCurrentSlide, slides, setSlides } = useContext(AvatarContext)
+  const { setAvatarSpeechText, currentAvatar, setCurrentAvatar, 
+    setPreviousAvatar, currentSlide, setCurrentSlide, 
+    setSlideScripts, isSubjectContainerDisabled, 
+    setIsSubjectContainerDisabled, selectedAvatarSynthesizer, 
+    setSelectedAvatarSynthesizer, isSessionRestarted, setIsSessionRestarted ,
+    slideScripts
+  } = useContext(AvatarContext)
 
   /**
    * Side effect to fetch subjects from backend
    */
   useEffect(() => {
     const fetchSubjects = async () => {
-      const response = await axios.get("http://127.0.0.1:8000/subjects");
-      setSubjects(response.data); // Assuming the response data is the array of subjects
+      const response = await axios.get("http://127.0.0.1:8000/subjects")
+      setSubjects(response.data) // Assuming the response data is the array of subjects
     };
 
-    fetchSubjects();
-  }, []);
+    fetchSubjects()
+  }, [])
 
   /**
    * Side effect to fetch avatar from backend
    */
   useEffect(() => {
-    // const fetchAvatars = async () => {
-      // const response = await axios.get("http://127.0.0.1:8000/avatar");
-      // setAvatars(response.data);
-      setAvatars([
-        {
-          avatarName: "Lisa",
-          avatarVoice: "en-US-AvaMultilingualNeural",
-          avatarStyle: "casual-sitting"
-        },
-        {
-          avatarName: "Harry",
-          avatarVoice: "en-US-AndrewMultilingualNeural",
-          avatarStyle: "youthful"
-        },
-        {
-          avatarName: "Jeff",
-          avatarVoice: "en-US-BrandonMultilingualNeural",
-          avatarStyle: "formal"
-        },
-        {
-          avatarName: "Max",
-          avatarVoice: "en-US-BrianMultilingualNeural",
-          avatarStyle: "casual"
-        },
-        {
-          avatarName: "Lori",
-          avatarVoice: "en-US-EmmaMultilingualNeural",
-          avatarStyle: "formal"
-        }
-      ])
-      // setAvatars(["Lisa", "Harry", "Jeff", "Max", "Lori"])
-    // };
+    const fetchAvatars = async () => {
+      const response = await axios.get("http://127.0.0.1:8000/avatar");
+      setAvatars(response.data);
+    };
 
-    // fetchAvatars();
+    fetchAvatars();
   }, []);
 
   /**
@@ -89,11 +91,11 @@ const App = () => {
       for (const path in avatarFiles) {
         const imageName = path
           .replace("./assets/avatars/", "")
-          .replace(/\.[^/.]+$/, "");
-        const imageModule = await avatarFiles[path]();
-        images[imageName] = imageModule.default;
+          .replace(/\.[^/.]+$/, "")
+        const imageModule = await avatarFiles[path]()
+        images[imageName] = imageModule.default
       }
-      setAvatarImages(images);
+      setAvatarImages(images)
     };
     loadImages();
   }, []);
@@ -115,11 +117,12 @@ const App = () => {
         );
         return;
       }
-      const baseUrl = "http://127.0.0.1:8000/generate/google-slide";
+      const baseUrl = "http://127.0.0.1:8000/generation/slide-and-script"
       const name = currentAvatar.avatarName;
       const subject = selectedSubject;
-      const url = `${baseUrl}/${name}/${subject}`;
+      const url = `${baseUrl}/${name}/${subject}`
       console.log(url);
+      setIsLiveChat(true)
 
       setLoader(true)
       const response = await axios.get(url, {
@@ -129,72 +132,68 @@ const App = () => {
       setLoader(false)
       setShowPresentationContainer(true)
 
-      const slidesResponse = [
-        {
-          slide: "Hello all, i'm avatar",
-          summary: "summary for slide0 "  
-        },
-        {
-          slide : "Data Science is an interdisciplinary field ",
-          summary : "Summary for slide1 Data Science is an interdisciplinary field "
-        },
-        {
-          slide : "Data refers to raw facts, figures, or information collected from various sources. ",
-          summary : "Summary for slide2 Data refers to raw facts, figures, or information collected from various sources."
-        },
-        {
-          slide : "Data Collection: Gathering data from sources like surveys, sensors, or databases",
-          summary : "Summary for slide3 Data Collection: Gathering data from sources like surveys, sensors, or databases"
-        },
-        {
-          slide : "Predicting house prices: Using historical data on house features ",
-          summary : "Summary for slide4 Predicting house prices: Using historical data on house features"
-        },
-        {
-          slide : "Data Science is used in various industries",
-          summary : "Summary for slide5 Data Science is used in various industries"
-        },
-        // {
-        //   slide: "Data Science is a powerful tool for solving real-world problems",
-        //   summary: "summary for slide6 Data Science is a powerful tool for solving real-world problems"
-        // }
-      ]
-
-
       if (response.data) {
-        const { videoUrl, slideUrl, slideAutomationTime } = response.data;
+        const { avatarSpeakingScript, slideUrl } = response.data
         console.log(response.data);
-
-        // if (videoUrl) {
-        //   setVideoUrl(videoUrl);
-        //   setSlideAutomationTime(slideAutomationTime);
-        // } else {
-        //   console.error("Video URL not found in the response");
-        // }
-
-        
 
         if (slideUrl) {
           setSlidesLink(slideUrl);
         } else {
-          console.error("Presentation URL not found in the response");
+          console.error("Presentation URL not found in the response")
         }
-        // setAvatarSpeechText("Hello Abhishek nice to meet you hope you have nice day")
 
-        if(videoUrl) {
+        if(avatarSpeakingScript) {
           setCurrentSlide(1)
-          setSlides(slidesResponse)
-          setAvatarSpeechText(slidesResponse[0].slide)
-          // setTimeout(() => {
-            // setCurrentSlide(currentSlide)
-          // }, 2000);
+          setSlideScripts(avatarSpeakingScript)
+          setAvatarSpeechText(avatarSpeakingScript[0].slide)
         }
+        setIsSubjectContainerDisabled(true)
       }
     } catch (error) {
       setLoader(false)
-      console.error("Error starting session:", error);
+      setIsSubjectContainerDisabled(false)
+      console.error("Error starting session:", error)
     }
   };
+
+  /**
+   * Function to handle stop session
+   */
+  const handleStopSession = () => {
+    handleStopSpeaking()
+    selectedAvatarSynthesizer.close()
+    setSelectedAvatarSynthesizer(null) 
+    setShowPresentationContainer(false)
+    setIsLiveChat(false)
+    setIsSessionRestarted(false)
+  }
+
+  /**
+   * Function to handle stop speaking 
+   */
+  const handleStopSpeaking = () => {
+    selectedAvatarSynthesizer.stopSpeakingAsync().then(
+      console.log("[" + (new Date()).toISOString() + "] Stop speaking request sent.")
+    ).catch((error) => {
+        selectedAvatarSynthesizer.close()
+        setSelectedAvatarSynthesizer(null) 
+    });
+  }
+
+  /**
+   * Function to handle restart session
+   */
+  const handleRestartSession = async () => {
+    const response = await axios.post(`http://127.0.0.1:8000/generation/script-character-change/${currentAvatar.avatarName}`, {
+      ...{slideScripts}
+    });
+
+    if(response.data){
+      setSlideScripts(response.data.avatarSpeakingScript)
+      setAvatarSpeechText(response.data.avatarSpeakingScript[currentSlide-1].slide)
+      setIsSessionRestarted(false)
+    } 
+  }
 
   /**
    * 
@@ -205,8 +204,8 @@ const App = () => {
   const handleAvatarClick = (avatar) => {
     setPreviousAvatar(currentAvatar)
     setCurrentAvatar(avatar)
-    if(!isLiveChat) setIsLiveChat(true);
-    console.log("Selected Avatar:", avatar);
+    if(!isLiveChat) setIsLiveChat(true)
+    console.log("Selected Avatar:", avatar)
   };
 
   /**
@@ -215,8 +214,10 @@ const App = () => {
    * @param {*} subject 
    */
   const handleSubjectClick = (subject) => {
-    setSelectedSubject(subject);
-    console.log("Selected subject:", subject);
+    if(!isSubjectContainerDisabled) {
+      setSelectedSubject(subject)
+      console.log("Selected subject:", subject)
+    }
   };
 
   return (
@@ -252,6 +253,7 @@ const App = () => {
                     selectedSubject === subject ? "Selected" : ""
                   }`} // Highlight selected subject
                   onClick={() => handleSubjectClick(subject)} // Set selected subject on click
+                  style={{cursor: showPresentationContainer ? "not-allowed" : "pointer"}}
                 >
                   <div className="subject-header">
                     <span className="star-icon">★</span>
@@ -264,31 +266,18 @@ const App = () => {
             </div>
           </div>
           <div className="generateContent">
-            {/* {!showPresentationContainer && <button
+            {!showPresentationContainer && <button
               onClick={handleStartSession}
-              className="generateContentButton"
+              className="generateContentButton start"
             >
               Start Session
-            </button>} */}
+            </button>}
 
-            <button
-              onClick={handleStartSession}
-              className="generateContentButton"
-            >
-              Start Session
-            </button>
+            {isSessionRestarted && <button className="generateContentButton restart" onClick={handleRestartSession}>Restart Session</button>}
 
-            {/* <button
-              onClick={() => setAvatarSpeechText("Hello Kavya nice to meet you")}
-              className="generateContentButton"
-            >
-              speak Session
-            </button> */}
-
-            {/* {showPresentationContainer && <div>
-                <button>New Character Assign</button>
-                <button>Stop Session</button>
-              </div>} */}
+            {(showPresentationContainer && !isSessionRestarted ) && <div>
+                <button onClick={handleStopSession} className="generateContentButton stop">Stop Session</button>
+              </div>}
           </div>
         </div>
         <div className="aiAvatarAppChatAndPresentationContainer">
@@ -331,7 +320,7 @@ const App = () => {
           </div>
 
           {/* {showPresentationContainer && <ChatInterface />} */}
-          <RealtimeChat/>
+          {showPresentationContainer && <RealtimeChat/>}
         </div>
       </div>
     </div>

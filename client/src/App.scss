@@ -13,12 +13,22 @@
 
 .generateContentButton {
   padding: 10px 20px; /* Button styling */
-  background-color: #4caf50;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: all 0.3s ease;
+
+  &.start{
+    background-color: #4caf50;
+  }
+
+  &.stop{
+    background-color: black;
+  }
+
+  &.restart{
+    background-color: orange;
+  }
 }
 
 .aiAvatarAppChatAndPresentationContainer .aiAvatarUserprofile {
@@ -33,10 +43,6 @@
   height: 100%;
   border-radius: 50%; /* Ensure circular profile image */
   object-fit: cover;
-}
-
-.generateContentButton:hover {
-  background-color: #45a049; /* Hover effect */
 }
 
 .aiAvatarUserprofile img {
@@ -133,14 +139,16 @@
   .subjects {
     display: flex;
     flex-direction: column;
+    cursor: pointer;
 
     .subject {
       padding: 8px 8px;
       border-bottom: 1px solid #eee;
-      cursor: pointer;
+      
 
       &:hover {
         background-color: rgb(206, 243, 206);
+        // cursor: pointer;
       }
 
       &:last-child {

@@ -7,7 +7,6 @@
   
   .hand {
     font-size: 30px;
-    cursor: pointer;
     color: white;
     width: 60px; /* Ensure icon is a perfect circle */
     height: 60px;
@@ -17,6 +16,7 @@
     justify-content: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     transition: background-color 0.3s ease;
+    cursor: pointer;
   
     &.raise{
       background-color: #4caf50;
