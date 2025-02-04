@@ -7,6 +7,9 @@ import { MutatingDots } from 'react-loader-spinner'
 import Avatar from "./components/avatar/Avatar";
 import RealtimeChat from "./components/realtimeChat/RealtimeChat";
 import { AvatarContext } from "./context/AvatarContext";
+import Modal from "./components/modal/Modal";
+import cogoToast from 'cogo-toast-react-17-fix';
+import { TOAST_MESSAGES } from "./constants/CommonConstants";
 
 const avatarsResponse = [
   {
@@ -48,6 +51,8 @@ const App = () => {
   const [loader, setLoader] = useState(false);
   const [showPresentationContainer, setShowPresentationContainer] = useState(false)
   const [isLiveChat, setIsLiveChat] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [tempAvatar, setTempAvatar] = useState()
   const { setAvatarSpeechText, currentAvatar, setCurrentAvatar, 
     setPreviousAvatar, currentSlide, setCurrentSlide, 
     setSlideScripts, isSubjectContainerDisabled, 
@@ -63,6 +68,7 @@ const App = () => {
     const fetchSubjects = async () => {
       const response = await axios.get("http://127.0.0.1:8000/subjects")
       setSubjects(response.data) // Assuming the response data is the array of subjects
+      cogoToast.success(TOAST_MESSAGES.SUCCESS_SUBJECTS_FETCHED);
     };
 
     fetchSubjects()
@@ -75,6 +81,7 @@ const App = () => {
     const fetchAvatars = async () => {
       const response = await axios.get("http://127.0.0.1:8000/avatar");
       setAvatars(response.data);
+      cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATARS_FETCHED);
     };
 
     fetchAvatars();
@@ -133,6 +140,7 @@ const App = () => {
       setShowPresentationContainer(true)
 
       if (response.data) {
+        cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_SCRIPT)
         const { avatarSpeakingScript, slideUrl } = response.data
         console.log(response.data);
 
@@ -152,6 +160,7 @@ const App = () => {
     } catch (error) {
       setLoader(false)
       setIsSubjectContainerDisabled(false)
+      cogoToast.error(TOAST_MESSAGES.ERROR_AVATAR_SCRIPT)
       console.error("Error starting session:", error)
     }
   };
@@ -189,6 +198,7 @@ const App = () => {
     });
 
     if(response.data){
+      cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_SCRIPT)
       setSlideScripts(response.data.avatarSpeakingScript)
       setAvatarSpeechText(response.data.avatarSpeakingScript[currentSlide-1].slide)
       setIsSessionRestarted(false)
@@ -202,10 +212,15 @@ const App = () => {
    * @param {*} avatar 
    */
   const handleAvatarClick = (avatar) => {
-    setPreviousAvatar(currentAvatar)
-    setCurrentAvatar(avatar)
-    if(!isLiveChat) setIsLiveChat(true)
-    console.log("Selected Avatar:", avatar)
+    if(currentAvatar !== null && showPresentationContainer){
+      setIsModalOpen(true)
+      setTempAvatar(avatar)
+    } else{
+       // setPreviousAvatar(currentAvatar)
+      setCurrentAvatar(avatar)
+      if(!isLiveChat) setIsLiveChat(true)
+      console.log("Selected Avatar:", avatar)
+    }
   };
 
   /**
@@ -219,6 +234,15 @@ const App = () => {
       console.log("Selected subject:", subject)
     }
   };
+
+  /**
+   * Function to accept avatar change inside modal
+   */
+  const acceptAvatarChange = () => {
+     setPreviousAvatar(currentAvatar)
+     setCurrentAvatar(tempAvatar)
+     setIsModalOpen(false)
+  }
 
   return (
     <div className="aiAvatarApp">
@@ -321,6 +345,20 @@ const App = () => {
 
           {/* {showPresentationContainer && <ChatInterface />} */}
           {showPresentationContainer && <RealtimeChat/>}
+          {/* <button */}
+          {/* { isModalOpen && (<Modal>
+            <h2>More Information</h2>
+            <button onClick={handleCloseModal}>Close</button>
+          </Modal>)} */}
+          {/* <button onClick={() => setIsModalOpen(true)}>Open Modal</button> */}
+
+          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+            <h4>Are you sure you want to switch avatar in the middle of the Session, if yes please after switching please restart session?</h4>
+            <div className="modalButtonGroup">
+              <button className="accept" onClick={acceptAvatarChange}>Yes</button>
+              <button className="reject" onClick={() => setIsModalOpen(false)}>No</button>
+            </div>
+          </Modal>
         </div>
       </div>
     </div>

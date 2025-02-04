@@ -4,6 +4,9 @@ import { createAvatarSynthesizer, createWebRTCConnection } from "../../Utility";
 import { useState, useEffect, useContext } from "react";
 import { useRef } from "react";
 import { AvatarContext } from "../../context/AvatarContext";
+import cogoToast from 'cogo-toast-react-17-fix';
+import { TOAST_MESSAGES } from "../../constants/CommonConstants";
+
 // import { AvatarSpeechContext } from "../../App";
 
 /**
@@ -115,6 +118,7 @@ const Avatar = ({ isLiveChat }) => {
     setAvatarSynthesizer(avatarSynthesizer);
     peerConnection.oniceconnectionstatechange = (e) => {
       if (peerConnection.iceConnectionState === "connected") {
+        cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_CONNECTED);
         console.log("Connected to Azure Avatar service");
       }
 
@@ -122,6 +126,7 @@ const Avatar = ({ isLiveChat }) => {
         peerConnection.iceConnectionState === "disconnected" ||
         peerConnection.iceConnectionState === "failed"
       ) {
+        cogoToast.error(TOAST_MESSAGES.ERROR_AVATAR_DISCONNECTED);
         console.log("Azure Avatar service Disconnected");
         console.log("Too many character swtiches attempted within a minute, Switching back to previous avatar.Please try after a minute !")
       }
@@ -130,9 +135,11 @@ const Avatar = ({ isLiveChat }) => {
     avatarSynthesizer
       .startAvatarAsync(peerConnection)
       .then((r) => {
+        cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_STARTED);
         console.log("[" + new Date().toISOString() + "] Avatar started.");
       })
       .catch((error) => {
+        cogoToast.error(TOAST_MESSAGES.ERROR_AVATAR_STOPPED);
         console.log(
           "[" +
             new Date().toISOString() +

@@ -258,3 +258,19 @@
   top: 50%;
   right: 30%;
 }
+
+.modalButtonGroup{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  .accept{
+    color: white;
+    background-color: #4caf50;
+  }
+
+  .reject{
+    color: white;
+    background-color: red;
+  }
+}
