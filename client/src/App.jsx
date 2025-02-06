@@ -10,6 +10,7 @@ import { AvatarContext } from "./context/AvatarContext";
 import Modal from "./components/modal/Modal";
 import cogoToast from 'cogo-toast-react-17-fix';
 import { TOAST_MESSAGES } from "./constants/CommonConstants";
+import Quiz from "./components/quiz/Quiz";
 
 const avatarsResponse = [
   {
@@ -359,6 +360,10 @@ const App = () => {
               <button className="reject" onClick={() => setIsModalOpen(false)}>No</button>
             </div>
           </Modal>
+
+          {/* <Modal isOpen={false} onClose={() => setIsModalOpen(false)}>
+            <Quiz/>  
+          </Modal>   */}
         </div>
       </div>
     </div>
