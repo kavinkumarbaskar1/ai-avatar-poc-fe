@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import "./Modal.scss"
 
 /**
+ * Modal Component
  * 
  * @param {*} children 
  * @returns 

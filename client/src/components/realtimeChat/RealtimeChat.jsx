@@ -69,6 +69,11 @@ const RealtimeChat = () => {
     });
   }
 
+  /**
+   * Function to send query to the chat
+   * 
+   * @param {*} query 
+   */
   const sendQuery = async (query) => {
     const requestBody = { query : query}
     const response = await axios.post(`http://127.0.0.1:8000/realtime-chat/${currentAvatar.avatarName}`, { ...requestBody});

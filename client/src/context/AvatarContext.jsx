@@ -19,6 +19,7 @@ export const AvatarProvider = ({ children }) => {
   const [slideScripts, setSlideScripts] = useState()
   const [isSubjectContainerDisabled, setIsSubjectContainerDisabled] = useState(false)
   const [isSessionRestarted, setIsSessionRestarted] = useState(false)
+  const [isSessionEnded, setIsSessionEnded] = useState(false)
   const isHandRaiseRef = useRef(isHandRaise);
 
   useEffect(() => {
@@ -43,7 +44,9 @@ export const AvatarProvider = ({ children }) => {
         slideScripts, setSlideScripts,
         isHandRaiseRef, updateIsHandRaise,
         isSubjectContainerDisabled, setIsSubjectContainerDisabled,
-        isSessionRestarted, setIsSessionRestarted}}>
+        isSessionRestarted, setIsSessionRestarted,
+        isSessionEnded, setIsSessionEnded
+        }}>
       {children}
     </AvatarContext.Provider>
   );

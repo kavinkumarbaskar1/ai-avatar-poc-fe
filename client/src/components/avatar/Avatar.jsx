@@ -7,8 +7,6 @@ import { AvatarContext } from "../../context/AvatarContext";
 import cogoToast from 'cogo-toast-react-17-fix';
 import { TOAST_MESSAGES } from "../../constants/CommonConstants";
 
-// import { AvatarSpeechContext } from "../../App";
-
 /**
  * component : This is avatar character from Azure Speech Service
  * @param {*} isLiveChat 
@@ -27,6 +25,7 @@ const Avatar = ({ isLiveChat }) => {
     previousAvatar, currentSlide, setCurrentSlide, 
     slideScripts , isHandRaiseRef,
     setIsSessionRestarted, isSubjectContainerDisabled,
+    setIsSessionEnded
   } = useContext(AvatarContext);
 
   useEffect(() => {
@@ -45,6 +44,11 @@ const Avatar = ({ isLiveChat }) => {
     }
   }, [avatarSpeechText]);
 
+  /**
+   * Function to handle track
+   * 
+   * @param {*} event 
+   */
   const handleOnTrack = (event) => {
     // Update UI elements
     if (event.track.kind === "video") {
@@ -66,7 +70,7 @@ const Avatar = ({ isLiveChat }) => {
   };
 
   /**
-   * function to use the text to voiced out the avatar
+   * Function to use the text to voiced out the avatar
    * @param {*} text 
    */
   const speakSelectedText = (text) => {
@@ -89,16 +93,23 @@ const Avatar = ({ isLiveChat }) => {
         }
         if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
           console.log("[" + (new Date()).toISOString() + "] Speech synthesized to speaker for text [ " + text + " ]. Result ID: " + result.resultId)
+          if(currentSlide === slideScripts.length){
+            setIsSessionEnded(true)
+          }
           if((currentSlide <= slideScripts.length) && (!isHandRaiseRef.current)){
             let tempSlide = currentSlide+1
             setCurrentSlide(tempSlide)
             setAvatarSpeechText(slideScripts[tempSlide-1].slide)
+            console.log("Current slide :: " + currentSlide + " ::length -> "+ slideScripts.length);
           }
+          
         }
       })
       .catch((error) => {
         avatarSynthesizer.close();
       });
+
+      
   };
 
   /**
