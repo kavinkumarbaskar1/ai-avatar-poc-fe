@@ -1,0 +1,276 @@
+.aiAvatarApp{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between; /* This ensures spacing between the children */
+  align-items: center;
+}
+
+
+.generateContentButton {
+  padding: 10px 20px; /* Button styling */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &.start{
+    background-color: #4caf50;
+  }
+
+  &.stop{
+    background-color: black;
+  }
+
+  &.restart{
+    background-color: orange;
+  }
+}
+
+.aiAvatarAppChatAndPresentationContainer .aiAvatarUserprofile {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  margin-left: auto; /* Push the icon to the far right */
+}
+
+.aiAvatarAppChatAndPresentationContainer .aiAvatarUserprofile img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%; /* Ensure circular profile image */
+  object-fit: cover;
+}
+
+.aiAvatarUserprofile img {
+  width: 50px; /* Avatar size */
+  height: 50px;
+  border-radius: 50%; /* Make the avatar circular */
+  object-fit: cover;
+}
+
+
+.aiAvatarAppMainContainer {
+  margin: 0px 50px;
+  display: flex;
+  gap: 10rem;
+
+  .aiAvatarAppMenu {
+    padding: 20px;
+    flex: 1;
+    // border-right: 1px solid lightgray;
+    height: 87vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    border-right: 1px solid lightgray;
+    .aiAvatarSelectionContainer {
+      display: flex;
+      gap: 15px; /* Reduced gap for better alignment with smaller avatars */
+
+      .aiAvatar {
+        width: 90px; /* Reduced size */
+        height: 90px;
+        cursor: pointer;
+        transition: all 0.3s ease; /* Smooth transition for hover and selection */
+
+        &.selectedAvatar {
+          border: 3px solid #4caf50; 
+          box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); 
+          transform: scale(1.1); 
+          border-radius: 50%;
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+      }
+
+      .aiAvatarLoadMore {
+        width: 90px; /* Matches the reduced size */
+        height: 90px;
+        background-color: lightgray;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%; /* Keep it circular */
+        font-size: 30px;
+        color: grey;
+        cursor: pointer;
+      }
+
+      .aiAvatarDisplay {
+        display: flex;
+        gap: 15px;
+      }
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+  }
+}
+
+.subjects-container {
+  width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #333;
+  }
+
+  .subjects {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+
+    .subject {
+      padding: 8px 8px;
+      border-bottom: 1px solid #eee;
+      
+
+      &:hover {
+        background-color: rgb(206, 243, 206);
+        // cursor: pointer;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &.Selected {
+        background-color: rgb(206, 243, 206); /* Highlight color */
+        color: white; /* Text color change for contrast */
+        box-shadow: 0 0 10px rgba(206, 243, 206, 0.2);
+
+        .subject-header .star-icon {
+          font-size: 16px;
+          color: green;
+        }
+      }
+
+      .subject-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .star-icon {
+          font-size: 16px;
+          color: #333;
+        }
+
+        .subject-title {
+          font-size: 14px;
+          font-weight: 500;
+          color: #333;
+          flex-grow: 1;
+          margin-left: 8px;
+        }
+
+        .arrow-icon {
+          font-size: 14px;
+          color: #333;
+        }
+      }
+
+      .subject-detail {
+        font-size: 12px;
+        color: #666;
+        margin-left: 24px;
+      }
+    }
+  }
+}
+
+
+.aiAvatarAppChatAndPresentationContainer {
+  padding: 20px;
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.aiAvatarSelectedAvatarContainer {
+  display: flex;
+  justify-content: center; 
+  margin-bottom: 20px;
+}
+
+.aiAvatarSelectedAvatar {
+  width: 250px; 
+  height: 250px; 
+  border-radius: 50%; 
+  overflow: hidden; 
+}
+
+.aiAvatarSelectedAvatar video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  border-radius: 50%;
+}
+
+.aiAvatarPresentationView {
+  margin-top: 20px; 
+  height: 60%;
+  display: flex;
+  border-radius: 15px;
+  align-items: center;
+  justify-content: center;
+  min-width: 750px;
+  margin: auto;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.aiAvatarUserprofile img {
+  width: 50px; /* Avatar size */
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+
+.loaderWrapper{
+  position: fixed;
+  top: 30%;
+  right: 28%;
+}
+
+.modalButtonGroup{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  .accept{
+    color: white;
+    background-color: #4caf50;
+  }
+
+  .reject{
+    color: white;
+    background-color: red;
+  }
+}

@@ -1,0 +1,109 @@
+.chat-container {
+  position: fixed;
+  bottom: 4rem;
+  right: 3rem;
+  z-index: 1000;
+}
+
+.chat-icon {
+  font-size: 30px;
+  cursor: pointer;
+  background-color: #4caf50;
+  color: white;
+  width: 60px; /* Ensure icon is a perfect circle */
+  height: 60px;
+  border-radius: 50%; /* Makes it round */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.chat-icon:hover {
+  background-color: #45a049;
+}
+
+.chat-interface {
+  position: absolute;
+  bottom: 80px; 
+  right: 0;
+  width: 400px; 
+  height: 500px; 
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.aiAvatarChatInterface {
+  flex-grow: 1; /* Take up available space */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: calc(100% - 80px); 
+  overflow-y: auto; 
+}
+
+.aiAvatarSystemChat {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 10px;
+  border-radius: 10px;
+  align-self: flex-start;
+  max-width: 80%; /* Increased chat bubble size */
+  font-size: 14px;
+}
+
+.aiAvatarUserChat {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  align-self: flex-end;
+  max-width: 80%;
+  font-size: 14px;
+}
+
+.chatInputContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ddd;
+}
+
+.chatInput {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+  font-size: 16px;
+}
+
+.sendButton {
+  width: 50px; /* Slightly larger button */
+  height: 50px;
+  background-color: #4caf50;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sendButton img {
+  width: 24px; 
+  height: 24px;
+  filter: invert(1); 
+}
+
+.sendButton:hover {
+  background-color: #45a049;
+}
