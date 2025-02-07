@@ -7,34 +7,10 @@ import { MutatingDots } from 'react-loader-spinner'
 import Avatar from "./components/avatar/Avatar";
 import RealtimeChat from "./components/realtimeChat/RealtimeChat";
 import { AvatarContext } from "./context/AvatarContext";
-
-const avatarsResponse = [
-  {
-    avatarName: "Lisa",
-    avatarVoice: "en-US-AvaMultilingualNeural",
-    avatarStyle: "casual-sitting"
-  },
-  {
-    avatarName: "Harry",
-    avatarVoice: "en-US-AndrewMultilingualNeural",
-    avatarStyle: "youthful"
-  },
-  {
-    avatarName: "Jeff",
-    avatarVoice: "en-US-BrandonMultilingualNeural",
-    avatarStyle: "formal"
-  },
-  {
-    avatarName: "Max",
-    avatarVoice: "en-US-BrianMultilingualNeural",
-    avatarStyle: "casual"
-  },
-  {
-    avatarName: "Lori",
-    avatarVoice: "en-US-EmmaMultilingualNeural",
-    avatarStyle: "formal"
-  }
-] 
+import Modal from "./components/modal/Modal";
+import cogoToast from 'cogo-toast-react-17-fix';
+import { TOAST_MESSAGES } from "./constants/CommonConstants";
+import Quiz from "./components/quiz/Quiz";
 
 const App = () => {
   const [subjects, setSubjects] = useState([]);
@@ -48,35 +24,37 @@ const App = () => {
   const [loader, setLoader] = useState(false);
   const [showPresentationContainer, setShowPresentationContainer] = useState(false)
   const [isLiveChat, setIsLiveChat] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [tempAvatar, setTempAvatar] = useState()
+  const [isQuizOpen, setIsQuizOpen] = useState(false)
+  const [quizData, setQuizData] = useState();
   const { setAvatarSpeechText, currentAvatar, setCurrentAvatar, 
     setPreviousAvatar, currentSlide, setCurrentSlide, 
     setSlideScripts, isSubjectContainerDisabled, 
     setIsSubjectContainerDisabled, selectedAvatarSynthesizer, 
-    setSelectedAvatarSynthesizer, isSessionRestarted, setIsSessionRestarted ,
-    slideScripts
+    setSelectedAvatarSynthesizer, isSessionRestarted, setIsSessionRestarted,
+    slideScripts, isSessionEnded, setIsSessionEnded
   } = useContext(AvatarContext)
 
   /**
-   * Side effect to fetch subjects from backend
+   * Side effect to fetch avatar, subjects and quiz data from backend
    */
   useEffect(() => {
+    // Function to fetch subjects
     const fetchSubjects = async () => {
       const response = await axios.get("http://127.0.0.1:8000/subjects")
       setSubjects(response.data) // Assuming the response data is the array of subjects
+      cogoToast.success(TOAST_MESSAGES.SUCCESS_SUBJECTS_FETCHED);
     };
 
-    fetchSubjects()
-  }, [])
-
-  /**
-   * Side effect to fetch avatar from backend
-   */
-  useEffect(() => {
+    // Function to fetch avatars
     const fetchAvatars = async () => {
       const response = await axios.get("http://127.0.0.1:8000/avatar");
       setAvatars(response.data);
+      cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATARS_FETCHED);
     };
 
+    fetchSubjects();
     fetchAvatars();
   }, []);
 
@@ -100,10 +78,26 @@ const App = () => {
     loadImages();
   }, []);
 
+  /**
+   * Side effect for opening the quiz modal
+   */
   useEffect(() => {
+    if(isSessionEnded) {
+      setIsQuizOpen(true)
+      setShowPresentationContainer(false)
+    }
+  },[isSessionEnded])
 
-  },[currentSlide])
 
+  /**
+   * Function to fetch quiz data
+   */
+  const getQuizData = async () => {
+      const response = await axios.get(`http://127.0.0.1:8000/generation/quiz`);
+      if(response.data) {
+          setQuizData(response.data)
+      }
+  }
   
 
   /**
@@ -133,6 +127,8 @@ const App = () => {
       setShowPresentationContainer(true)
 
       if (response.data) {
+
+        cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_SCRIPT)
         const { avatarSpeakingScript, slideUrl } = response.data
         console.log(response.data);
 
@@ -148,10 +144,12 @@ const App = () => {
           setAvatarSpeechText(avatarSpeakingScript[0].slide)
         }
         setIsSubjectContainerDisabled(true)
+        getQuizData()
       }
     } catch (error) {
       setLoader(false)
       setIsSubjectContainerDisabled(false)
+      cogoToast.error(TOAST_MESSAGES.ERROR_AVATAR_SCRIPT)
       console.error("Error starting session:", error)
     }
   };
@@ -189,6 +187,7 @@ const App = () => {
     });
 
     if(response.data){
+      cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_SCRIPT)
       setSlideScripts(response.data.avatarSpeakingScript)
       setAvatarSpeechText(response.data.avatarSpeakingScript[currentSlide-1].slide)
       setIsSessionRestarted(false)
@@ -202,10 +201,15 @@ const App = () => {
    * @param {*} avatar 
    */
   const handleAvatarClick = (avatar) => {
-    setPreviousAvatar(currentAvatar)
-    setCurrentAvatar(avatar)
-    if(!isLiveChat) setIsLiveChat(true)
-    console.log("Selected Avatar:", avatar)
+    if(currentAvatar !== null && showPresentationContainer){
+      setIsModalOpen(true)
+      setTempAvatar(avatar)
+    } else{
+       // setPreviousAvatar(currentAvatar)
+      setCurrentAvatar(avatar)
+      if(!isLiveChat) setIsLiveChat(true)
+      console.log("Selected Avatar:", avatar)
+    }
   };
 
   /**
@@ -219,6 +223,15 @@ const App = () => {
       console.log("Selected subject:", subject)
     }
   };
+
+  /**
+   * Function to accept avatar change inside modal
+   */
+  const acceptAvatarChange = () => {
+     setPreviousAvatar(currentAvatar)
+     setCurrentAvatar(tempAvatar)
+     setIsModalOpen(false)
+  }
 
   return (
     <div className="aiAvatarApp">
@@ -319,8 +332,17 @@ const App = () => {
               <Avatar isLiveChat={isLiveChat}></Avatar>
           </div>
 
-          {/* {showPresentationContainer && <ChatInterface />} */}
           {showPresentationContainer && <RealtimeChat/>}
+
+          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+            <h4>Are you sure you want to switch avatar in the middle of the Session, if yes please after switching please restart session?</h4>
+            <div className="modalButtonGroup">
+              <button className="accept" onClick={acceptAvatarChange}>Yes</button>
+              <button className="reject" onClick={() => setIsModalOpen(false)}>No</button>
+            </div>
+          </Modal>
+
+          <Quiz isQuizOpen={isQuizOpen} onQuizClose={() => setIsQuizOpen(false)} quizData={quizData}/>
         </div>
       </div>
     </div>

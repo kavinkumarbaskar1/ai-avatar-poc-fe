@@ -3,6 +3,11 @@ import axios from "axios";
 import "./ChatInterface.scss";
 import send from "../../assets/send.png";
 
+/**
+ * ChatInterface Modal
+ * 
+ * @returns 
+ */
 const ChatInterface = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatHistory, setChatHistory] = useState([
