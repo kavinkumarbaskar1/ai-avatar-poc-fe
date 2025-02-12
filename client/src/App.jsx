@@ -32,7 +32,7 @@ const App = () => {
     setPreviousAvatar, currentSlide, setCurrentSlide, 
     setSlideScripts, isSubjectContainerDisabled, 
     setIsSubjectContainerDisabled, selectedAvatarSynthesizer, 
-    setSelectedAvatarSynthesizer, isSessionRestarted, setIsSessionRestarted,
+    setSelectedAvatarSynthesizer, isSessionResumed, setIsSessionResumed,
     slideScripts, isSessionEnded, setIsSessionEnded
   } = useContext(AvatarContext)
 
@@ -44,14 +44,14 @@ const App = () => {
     const fetchSubjects = async () => {
       const response = await axios.get("http://127.0.0.1:8000/subjects")
       setSubjects(response.data) // Assuming the response data is the array of subjects
-      cogoToast.success(TOAST_MESSAGES.SUCCESS_SUBJECTS_FETCHED);
+      // cogoToast.success(TOAST_MESSAGES.SUCCESS_SUBJECTS_FETCHED);
     };
 
     // Function to fetch avatars
     const fetchAvatars = async () => {
       const response = await axios.get("http://127.0.0.1:8000/avatar");
       setAvatars(response.data);
-      cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATARS_FETCHED);
+      // cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATARS_FETCHED);
     };
 
     fetchSubjects();
@@ -128,7 +128,7 @@ const App = () => {
 
       if (response.data) {
 
-        cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_SCRIPT)
+        // cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_SCRIPT)
         const { avatarSpeakingScript, slideUrl } = response.data
         console.log(response.data);
 
@@ -149,7 +149,7 @@ const App = () => {
     } catch (error) {
       setLoader(false)
       setIsSubjectContainerDisabled(false)
-      cogoToast.error(TOAST_MESSAGES.ERROR_AVATAR_SCRIPT)
+      // cogoToast.error(TOAST_MESSAGES.ERROR_AVATAR_SCRIPT)
       console.error("Error starting session:", error)
     }
   };
@@ -163,7 +163,7 @@ const App = () => {
     setSelectedAvatarSynthesizer(null) 
     setShowPresentationContainer(false)
     setIsLiveChat(false)
-    setIsSessionRestarted(false)
+    setIsSessionResumed(false)
   }
 
   /**
@@ -181,16 +181,16 @@ const App = () => {
   /**
    * Function to handle restart session
    */
-  const handleRestartSession = async () => {
+  const handleResumeSession = async () => {
     const response = await axios.post(`http://127.0.0.1:8000/generation/script-character-change/${currentAvatar.avatarName}`, {
       ...{slideScripts}
     });
 
     if(response.data){
-      cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_SCRIPT)
+      // cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_SCRIPT)
       setSlideScripts(response.data.avatarSpeakingScript)
       setAvatarSpeechText(response.data.avatarSpeakingScript[currentSlide-1].slide)
-      setIsSessionRestarted(false)
+      setIsSessionResumed(false)
     } 
   }
 
@@ -286,9 +286,9 @@ const App = () => {
               Start Session
             </button>}
 
-            {isSessionRestarted && <button className="generateContentButton restart" onClick={handleRestartSession}>Restart Session</button>}
+            {isSessionResumed && <button className="generateContentButton restart" onClick={handleResumeSession}>Resume Session</button>}
 
-            {(showPresentationContainer && !isSessionRestarted ) && <div>
+            {(showPresentationContainer && !isSessionResumed ) && <div>
                 <button onClick={handleStopSession} className="generateContentButton stop">Stop Session</button>
               </div>}
           </div>
@@ -335,7 +335,7 @@ const App = () => {
           {showPresentationContainer && <RealtimeChat/>}
 
           <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-            <h4>Are you sure you want to switch avatar in the middle of the Session, if yes please after switching please restart session?</h4>
+            <h4>Are you sure you want to switch avatar?</h4>
             <div className="modalButtonGroup">
               <button className="accept" onClick={acceptAvatarChange}>Yes</button>
               <button className="reject" onClick={() => setIsModalOpen(false)}>No</button>
