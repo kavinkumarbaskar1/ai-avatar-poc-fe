@@ -18,7 +18,7 @@ export const AvatarProvider = ({ children }) => {
   const [currentSlide, setCurrentSlide] = useState(1)
   const [slideScripts, setSlideScripts] = useState()
   const [isSubjectContainerDisabled, setIsSubjectContainerDisabled] = useState(false)
-  const [isSessionRestarted, setIsSessionRestarted] = useState(false)
+  const [isSessionResumed, setIsSessionResumed] = useState(false)
   const [isSessionEnded, setIsSessionEnded] = useState(false)
   const isHandRaiseRef = useRef(isHandRaise);
 
@@ -44,7 +44,7 @@ export const AvatarProvider = ({ children }) => {
         slideScripts, setSlideScripts,
         isHandRaiseRef, updateIsHandRaise,
         isSubjectContainerDisabled, setIsSubjectContainerDisabled,
-        isSessionRestarted, setIsSessionRestarted,
+        isSessionResumed, setIsSessionResumed,
         isSessionEnded, setIsSessionEnded
         }}>
       {children}

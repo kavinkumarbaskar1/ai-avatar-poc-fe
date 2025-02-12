@@ -24,7 +24,7 @@ const Avatar = ({ isLiveChat }) => {
     setSelectedAvatarSynthesizer, currentAvatar, 
     previousAvatar, currentSlide, setCurrentSlide, 
     slideScripts , isHandRaiseRef,
-    setIsSessionRestarted, isSubjectContainerDisabled,
+    setIsSessionResumed, isSubjectContainerDisabled,
     setIsSessionEnded
   } = useContext(AvatarContext);
 
@@ -129,7 +129,7 @@ const Avatar = ({ isLiveChat }) => {
     setAvatarSynthesizer(avatarSynthesizer);
     peerConnection.oniceconnectionstatechange = (e) => {
       if (peerConnection.iceConnectionState === "connected") {
-        cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_CONNECTED);
+        // cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_CONNECTED);
         console.log("Connected to Azure Avatar service");
       }
 
@@ -137,7 +137,7 @@ const Avatar = ({ isLiveChat }) => {
         peerConnection.iceConnectionState === "disconnected" ||
         peerConnection.iceConnectionState === "failed"
       ) {
-        cogoToast.error(TOAST_MESSAGES.ERROR_AVATAR_DISCONNECTED);
+        // cogoToast.error(TOAST_MESSAGES.ERROR_AVATAR_DISCONNECTED);
         console.log("Azure Avatar service Disconnected");
         console.log("Too many character swtiches attempted within a minute, Switching back to previous avatar.Please try after a minute !")
       }
@@ -146,11 +146,11 @@ const Avatar = ({ isLiveChat }) => {
     avatarSynthesizer
       .startAvatarAsync(peerConnection)
       .then((r) => {
-        cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_STARTED);
+        // cogoToast.success(TOAST_MESSAGES.SUCCESS_AVATAR_STARTED);
         console.log("[" + new Date().toISOString() + "] Avatar started.");
       })
       .catch((error) => {
-        cogoToast.error(TOAST_MESSAGES.ERROR_AVATAR_STOPPED);
+        // cogoToast.error(TOAST_MESSAGES.ERROR_AVATAR_STOPPED);
         console.log(
           "[" +
             new Date().toISOString() +
@@ -177,7 +177,7 @@ const Avatar = ({ isLiveChat }) => {
     startSession(currentAvatar)
 
     if(previousAvatar && currentAvatar && isSubjectContainerDisabled){
-      setIsSessionRestarted(true)
+      setIsSessionResumed(true)
     }
   }
 
